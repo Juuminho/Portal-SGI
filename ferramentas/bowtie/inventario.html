@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventário de Riscos — Bowtie SGI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23006667'/%3E%3Cpath d='M4 7v10l6-3.8V10.8L4 7z' fill='%238CB292'/%3E%3Cpath d='M20 7v10l-6-3.8V10.8L20 7z' fill='%23fff' opacity='.92'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-inv">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M3 5v14l7-4.6V9.6L3 5z" fill="#8CB292"/><path d="M21 5v14l-7-4.6V9.6L21 5z" fill="#ffffff" opacity=".92"/><circle cx="12" cy="12" r="2.4" fill="#fff"/></svg>
+      </div>
+      <div class="brand-text">
+        <strong>Bowtie SGI</strong>
+        <span>Gestão de Riscos · SGI</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="nav-link" href="../../index.html">← Portal</a>
+      <a class="nav-link" href="index.html">Editor</a>
+      <a class="nav-link ativo" href="inventario.html">Inventário</a>
+    </nav>
+  </header>
+
+  <div id="avisoConfig" class="aviso-config escondido">
+    ⚠️ <b>O inventário precisa do Supabase:</b> falta colar a chave no arquivo <b>config.js</b>.
+  </div>
+
+  <main class="inv-main">
+    <div class="inv-top">
+      <div class="tabs">
+        <button class="tab ativo" id="tabLista">Inventário de Riscos</button>
+        <button class="tab" id="tabComum">Riscos em comum</button>
+      </div>
+      <div class="filtros" id="filtros">
+        <div class="busca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="fBusca" placeholder="Buscar por risco, ameaça, controle, consequência…" />
+        </div>
+        <select id="fTag"><option value="">Todas as operações</option></select>
+        <select id="fCenario">
+          <option value="">Todos os cenários</option>
+          <option value="independente">Independente da produção</option>
+          <option value="dependente">Dependente da produção</option>
+          <option value="_indef">— sem definição —</option>
+        </select>
+        <select id="fStatus">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativos</option>
+          <option value="inativo">Inativos</option>
+        </select>
+        <span class="contagem" id="contagem"></span>
+      </div>
+    </div>
+
+    <section id="viewLista">
+      <div class="tabela-wrap">
+        <table class="inv-tabela">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Risco</th>
+              <th>Operações</th>
+              <th>Cenário</th>
+              <th style="text-align:center">Ameaças</th>
+              <th style="text-align:center">Controles</th>
+              <th style="text-align:center">Conseq.</th>
+              <th>Atualizado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="viewComum" class="escondido">
+      <p class="comum-intro">
+        Ameaças e eventos que aparecem em <b>mais de um bowtie</b> — útil para enxergar riscos
+        compartilhados entre operações (ex.: vazamento de gás natural presente no forno e no briquete).
+      </p>
+      <div id="comumLista"></div>
+    </section>
+  </main>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="ui.js"></script>
+  <script src="inventario.js"></script>
+</body>
+</html>

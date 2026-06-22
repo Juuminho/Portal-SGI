@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bowtie SGI — Gestão de Riscos</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23006667'/%3E%3Cpath d='M4 7v10l6-3.8V10.8L4 7z' fill='%238CB292'/%3E%3Cpath d='M20 7v10l-6-3.8V10.8L20 7z' fill='%23fff' opacity='.92'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-editor">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M3 5v14l7-4.6V9.6L3 5z" fill="#8CB292"/><path d="M21 5v14l-7-4.6V9.6L21 5z" fill="#ffffff" opacity=".92"/><circle cx="12" cy="12" r="2.4" fill="#fff"/></svg>
+      </div>
+      <div class="brand-text">
+        <strong>Bowtie SGI</strong>
+        <span>Gestão de Riscos · SGI</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="nav-link" href="../../index.html">← Portal</a>
+      <a class="nav-link ativo" href="index.html">Editor</a>
+      <a class="nav-link" href="inventario.html">Inventário</a>
+    </nav>
+    <input id="nomeDiagrama" class="nome-diagrama" placeholder="Nome do risco / diagrama…" />
+  </header>
+
+  <div id="avisoConfig" class="aviso-config escondido">
+    ⚠️ <b>Salvar está desativado:</b> falta colar a chave do Supabase no arquivo <b>config.js</b>.
+    Você pode desenhar e exportar em PDF normalmente.
+  </div>
+
+  <div class="toolbar">
+    <div class="grupo">
+      <button class="btn secundario" id="btnNovo">Novo</button>
+    </div>
+    <div class="grupo">
+      <button class="btn btn-ameaca" id="btnAmeaca">+ Ameaça</button>
+      <button class="btn btn-conseq" id="btnConsequencia">+ Consequência</button>
+    </div>
+    <div class="grupo">
+      <button class="btn salvar" id="btnSalvar">Salvar</button>
+      <button class="btn secundario" id="btnAbrir">Abrir</button>
+      <button class="btn secundario" id="btnImprimir">PDF</button>
+    </div>
+    <span id="status" class="status"></span>
+  </div>
+
+  <div class="props-bar">
+    <button id="statusRisco" class="pill pill-status ativo" title="Clique para alternar entre ativo e inativo">Risco ativo</button>
+    <label class="prop-label">Cenário
+      <select id="cenario">
+        <option value="">— definir —</option>
+        <option value="independente">Independente da produção (geral)</option>
+        <option value="dependente">Dependente da produção</option>
+      </select>
+    </label>
+    <div class="tags-box">
+      <span class="prop-label">Operações:</span>
+      <span id="tagsChips"></span>
+      <input id="tagInput" placeholder="ex.: forno, briquete… (Enter)" />
+    </div>
+  </div>
+
+  <div id="canvas">
+    <svg id="wires"></svg>
+  </div>
+
+  <!-- Gaveta lateral: detalhes do controle/barreira -->
+  <aside id="drawer" class="drawer" aria-label="Detalhes do controle">
+    <div class="drawer-head">
+      <h3 id="drawerTitulo">Detalhes do controle</h3>
+      <button class="icone" id="drawerFechar" title="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <label>Descrição
+        <textarea id="dTexto" rows="3"></textarea>
+      </label>
+      <label>Tipo do controle
+        <select id="dTipo"></select>
+      </label>
+      <label class="switch-row">Controle Crítico (CC)
+        <input type="checkbox" id="dCC" />
+      </label>
+      <label>Status de operação
+        <select id="dStatusOp">
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+      </label>
+      <label>Implementação
+        <select id="dStatusImpl">
+          <option value="">— definir —</option>
+          <option value="implementado">Implementado</option>
+          <option value="nao_implementado">Não implementado</option>
+        </select>
+      </label>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn perigo" id="dExcluir">Excluir controle</button>
+    </div>
+  </aside>
+
+  <!-- Painel lateral de diagramas salvos -->
+  <div id="painel" class="painel">
+    <h3>Diagramas salvos</h3>
+    <div id="listaSalvos" class="lista"></div>
+    <div class="fechar" id="painelFechar">✕ Fechar</div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

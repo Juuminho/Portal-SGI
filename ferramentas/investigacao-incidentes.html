@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investigação de Incidentes — Análise de Causa | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  /* TOPO */
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.prim{background:linear-gradient(135deg,var(--azul-500),var(--verde-500));color:#fff;border:0}
+  .btn.prim:hover{filter:brightness(1.07)}
+  .btn.danger{color:#b42318}
+  .btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+
+  /* ABAS */
+  .abas{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .aba{flex:1;min-width:200px;text-align:left;border:1px solid var(--linha);background:#fff;border-radius:var(--raio);padding:14px 16px;cursor:pointer;transition:.18s}
+  .aba:hover{border-color:var(--azul-300)}
+  .aba.ativa{border-color:transparent;color:#fff;box-shadow:var(--sombra)}
+  .aba[data-m="ishikawa"].ativa{background:linear-gradient(135deg,#0f7a4d,#16a34a)}
+  .aba[data-m="porques"].ativa{background:linear-gradient(135deg,#1769aa,#149b8e)}
+  .aba[data-m="arvore"].ativa{background:linear-gradient(135deg,#0a2540,#1769aa)}
+  .aba b{display:block;font-size:15px}
+  .aba small{font-size:12px;opacity:.85}
+
+  /* CABEÇALHO IDENTIFICAÇÃO */
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+
+  .painel{display:none}
+  .painel.ativo{display:block;animation:fade .2s}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+
+  /* ===== ISHIKAWA / FISHBONE ===== */
+  .efeito-box{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;margin-bottom:6px}
+  .efeito-box .lbl{display:flex;align-items:center;font-weight:800;color:var(--verde-700);font-size:14px;white-space:nowrap}
+  .efeito-box input{flex:1;min-width:220px;border:2px solid var(--verde-500);background:#f0fdf4;border-radius:10px;padding:11px 13px;font-size:15px;font-weight:600;font-family:inherit;color:var(--verde-700)}
+  .efeito-box input:focus{outline:0;box-shadow:0 0 0 3px rgba(22,163,74,.18)}
+  .fishbone{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+  .cat{border:1px solid var(--linha);border-radius:12px;overflow:hidden;background:#fafcfe}
+  .cat-h{padding:9px 12px;font-weight:800;font-size:12.5px;letter-spacing:.4px;color:#fff;background:linear-gradient(135deg,var(--azul-700),var(--azul-500))}
+  .cat:nth-child(n+4) .cat-h{background:linear-gradient(135deg,var(--verde-700),var(--verde-500))}
+  .cat-body{padding:10px}
+  .cause{width:100%;border:1px solid var(--linha);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;margin-bottom:6px;resize:vertical;min-height:34px}
+  .cause:focus{outline:0;border-color:var(--azul-300)}
+  .add-min{font-size:12px;color:var(--azul-500);background:none;border:1px dashed var(--azul-300);border-radius:7px;padding:5px 9px;cursor:pointer;width:100%}
+  .add-min:hover{background:#eef5fb}
+
+  /* ===== 5 PORQUÊS ===== */
+  .porq-prob input,.porq textarea{width:100%;font-family:inherit;font-size:14px;border:1px solid var(--linha);border-radius:9px;padding:10px 12px;resize:vertical}
+  .porq-prob input:focus,.porq textarea:focus{outline:0;border-color:var(--azul-300)}
+  .porq-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+  .porq-num{flex:none;width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--azul-500),var(--verde-500));color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .porq-row .lbl{font-size:11px;font-weight:700;color:var(--cinza);margin-bottom:3px;display:block}
+  .porq-row .grow{flex:1}
+  .raiz{margin-top:14px;border:2px solid var(--verde-500);background:#f0fdf4;border-radius:12px;padding:14px}
+  .raiz label{font-weight:800;color:var(--verde-700);font-size:13px;display:block;margin-bottom:6px}
+  .raiz textarea{width:100%;border:1px solid var(--verde-300);border-radius:9px;padding:10px;font-family:inherit;font-size:14px;resize:vertical}
+
+  /* ===== ÁRVORE DE CAUSA ===== */
+  .nivel{margin-bottom:8px}
+  .nivel-h{font-size:12px;font-weight:800;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;text-align:center}
+  .acidente-top{max-width:520px;margin:0 auto 4px}
+  .acidente-top input{width:100%;border:2px solid var(--verde-500);background:#f0fdf4;border-radius:10px;padding:11px;font-size:15px;font-weight:700;text-align:center;font-family:inherit;color:var(--verde-700)}
+  .seta{text-align:center;color:var(--azul-300);font-size:20px;line-height:1;margin:2px 0}
+  .nivel-boxes{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .nivel-boxes textarea{flex:1;min-width:150px;max-width:230px;border:1px solid var(--linha);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:42px;background:#fafcfe}
+  .nivel-boxes textarea:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .add-box{border:1px dashed var(--azul-300);background:none;color:var(--azul-500);border-radius:9px;padding:8px 12px;cursor:pointer;font-size:13px}
+  .add-box:hover{background:#eef5fb}
+
+  /* ===== EVIDÊNCIAS ===== */
+  .evid-area{border:2px dashed var(--linha);border-radius:12px;padding:16px;text-align:center;background:#fafcfe}
+  .evid-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .evid-thumb{position:relative;width:120px;height:120px;border-radius:10px;overflow:hidden;border:1px solid var(--linha);background:#fff}
+  .evid-thumb img{width:100%;height:100%;object-fit:cover}
+  .evid-thumb button{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(180,35,24,.92);color:#fff;cursor:pointer;font-size:14px;line-height:1}
+  .evid-add{display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:var(--azul-700);font-weight:600;font-size:14px}
+  .pasta-link{margin-top:12px}
+  .pasta-link input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:13.5px}
+
+  /* ===== PLANO DE AÇÃO 5W2H ===== */
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.plano{border-collapse:collapse;width:100%;min-width:920px;font-size:13px}
+  table.plano th{background:var(--azul-900);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;font-weight:700}
+  table.plano td{border-bottom:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.plano tr:nth-child(even) td{background:#fafcfe}
+  table.plano .nro{text-align:center;font-weight:800;color:var(--cinza);width:34px}
+  table.plano textarea,table.plano input,table.plano select{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 7px;font-family:inherit;font-size:13px;resize:vertical;background:transparent}
+  table.plano textarea:focus,table.plano input:focus,table.plano select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.plano select{cursor:pointer}
+  .st{font-weight:700}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:17px;padding:4px 6px}
+  .add-row{margin-top:10px}
+
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+
+  footer{max-width:1180px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+
+  @media(max-width:760px){.fishbone{grid-template-columns:1fr}.tit span{display:none}}
+
+  /* ===== IMPRESSÃO / PDF ===== */
+  @media print{
+    body{background:#fff}
+    header.topo,.abas,.toolbar,.hint,.add-min,.add-row,.add-box,.evid-add,.col-del,.voltar,footer .no-print{display:none!important}
+    .painel{display:none!important}
+    .painel.ativo{display:block!important}
+    .card{box-shadow:none;border:1px solid #ccc}
+    main{max-width:100%;padding:0}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    textarea,input,select{border-color:#ddd!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Investigação de Incidentes<span>Análise de Causa · Ishikawa · 5 Porquês · Árvore de Causa</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ABAS -->
+  <div class="abas">
+    <button class="aba ativa" data-m="ishikawa"><b>🐟 Ishikawa</b><small>Espinha de peixe — os 6 M</small></button>
+    <button class="aba" data-m="porques"><b>❓ 5 Porquês</b><small>Da causa até a raiz</small></button>
+    <button class="aba" data-m="arvore"><b>🌳 Árvore de Causa</b><small>Investigação formal de acidente</small></button>
+  </div>
+
+  <!-- IDENTIFICAÇÃO (compartilhada) -->
+  <div class="ident">
+    <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+    <div class="campo"><label>Nº do registro</label><input id="h-registro" data-save></div>
+  </div>
+
+  <!-- ===================== PAINEL ISHIKAWA ===================== -->
+  <section class="painel ativo" id="p-ishikawa">
+    <div class="hint">Escreva o <b>problema</b> no Efeito (verde). Em cada categoria pergunte: “o que, nesta área, pode estar causando o problema?”. Dica: use o Ishikawa para a visão ampla e depois aprofunde a causa principal nos 5 Porquês.</div>
+    <div class="card">
+      <div class="efeito-box">
+        <div class="lbl">EFEITO&nbsp;➜</div>
+        <input id="ish-efeito" data-save placeholder="Escreva aqui o problema / acidente">
+      </div>
+      <div class="fishbone" id="ish-fishbone"></div>
+    </div>
+  </section>
+
+  <!-- ===================== PAINEL 5 PORQUÊS ===================== -->
+  <section class="painel" id="p-porques">
+    <div class="hint">Pergunte “por quê?” sobre a resposta anterior, até chegar na <b>causa raiz</b> (a origem real). Não precisa usar os 5 — pare quando chegar na raiz.</div>
+    <div class="card porq">
+      <div class="campo porq-prob" style="margin-bottom:14px"><label style="font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase">Problema</label><input id="porq-problema" data-save placeholder="Qual foi o problema / acidente?"></div>
+      <div id="porq-lista"></div>
+      <div class="raiz">
+        <label>✅ CAUSA RAIZ</label>
+        <textarea id="porq-raiz" rows="2" data-save placeholder="A origem real do problema, descoberta no último porquê"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAINEL ÁRVORE DE CAUSA ===================== -->
+  <section class="painel" id="p-arvore">
+    <div class="hint">Comece pela caixa verde (ACIDENTE) no topo. Pergunte “o que aconteceu logo ANTES para causar isso?” e desça preenchendo. Cada caixa = 1 fato concreto (não opinião). Pode haver mais de uma causa por nível.</div>
+    <div class="card">
+      <div class="nivel-h">Acidente (fato final)</div>
+      <div class="acidente-top"><input id="arv-acidente" data-save placeholder="O que aconteceu?"></div>
+      <div class="seta">▼</div>
+      <div class="nivel"><div class="nivel-h">Fatos imediatos</div><div class="nivel-boxes" id="arv-imediatos"></div><div style="text-align:center;margin-top:8px"><button class="add-box" data-nivel="imediatos">+ fato imediato</button></div></div>
+      <div class="seta">▼</div>
+      <div class="nivel"><div class="nivel-h">Fatos intermediários</div><div class="nivel-boxes" id="arv-intermediarios"></div><div style="text-align:center;margin-top:8px"><button class="add-box" data-nivel="intermediarios">+ fato intermediário</button></div></div>
+      <div class="seta">▼</div>
+      <div class="nivel"><div class="nivel-h">Causas de origem</div><div class="nivel-boxes" id="arv-origem"></div><div style="text-align:center;margin-top:8px"><button class="add-box" data-nivel="origem">+ causa de origem</button></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== EVIDÊNCIAS (por método) ===================== -->
+  <div class="secao">📷 Evidências / Fotos</div>
+  <div class="card">
+    <div class="evid-area">
+      <label class="evid-add">➕ Adicionar foto / evidência
+        <input type="file" accept="image/*" multiple hidden id="evid-input">
+      </label>
+      <div class="evid-grid" id="evid-grid"></div>
+    </div>
+    <div class="pasta-link"><input id="evid-pasta" data-save placeholder="Pasta / link onde os arquivos estão guardados (opcional)"></div>
+  </div>
+
+  <!-- ===================== PLANO DE AÇÃO 5W2H ===================== -->
+  <div class="secao">📋 Plano de Ação (5W2H)</div>
+  <div class="card">
+    <div class="tabela-wrap">
+      <table class="plano">
+        <thead><tr>
+          <th class="nro">Nº</th><th>O quê — ação corretiva</th><th>Por quê</th><th>Onde</th><th>Quem</th><th>Quando</th><th>Como</th><th>Quanto custa</th><th>Status</th><th></th>
+        </tr></thead>
+        <tbody id="plano-body"></tbody>
+      </table>
+    </div>
+    <button class="btn add-row" id="add-acao">+ Adicionar ação</button>
+  </div>
+</main>
+
+<footer>
+  <div class="no-print">SGI — Sistema de Gestão Integrada · Investigação de Incidentes</div>
+  Desenvolvido por <b>Júlio César Moura de Oliveira</b>
+</footer>
+
+<script>
+/* ============================================================
+   ESTRUTURA: 3 métodos. Cada método tem seu próprio conjunto de
+   Evidências e Plano de Ação. O cabeçalho (empresa/responsável/
+   data/registro) é compartilhado entre os três.
+   Tudo é salvo automaticamente no navegador (localStorage) e pode
+   ser exportado/importado como arquivo .json e impresso em PDF.
+   ============================================================ */
+const METODOS = ["ishikawa","porques","arvore"];
+const CATS = [
+  {k:"metodo",n:"MÉTODO"},{k:"maquina",n:"MÁQUINA"},{k:"material",n:"MATERIAL"},
+  {k:"maoobra",n:"MÃO DE OBRA"},{k:"medicao",n:"MEDIÇÃO"},{k:"meioambiente",n:"MEIO AMBIENTE"}
+];
+const STATUS = ["Não iniciado","Em andamento","Concluído","Atrasado"];
+const STORE = "sgi_investigacao_incidentes";
+
+let metodoAtivo = "ishikawa";
+// dados que não são inputs simples (fotos): guardados por método
+const EVID = {ishikawa:[],porques:[],arvore:[]};
+// conteúdo por método (gerado dinamicamente)
+const DADOS = {
+  ishikawa:{efeito:"",cats:{},pasta:"",acoes:[]},
+  porques:{problema:"",porques:["","","","",""],raiz:"",pasta:"",acoes:[]},
+  arvore:{acidente:"",imediatos:[""],intermediarios:[""],origem:[""],pasta:"",acoes:[]}
+};
+CATS.forEach(c=>DADOS.ishikawa.cats[c.k]=[""]);
+
+/* ---------- montagem inicial das partes dinâmicas ---------- */
+function montarFishbone(){
+  const wrap=document.getElementById("ish-fishbone");
+  wrap.innerHTML=CATS.map(c=>`
+    <div class="cat" data-cat="${c.k}">
+      <div class="cat-h">${c.n}</div>
+      <div class="cat-body" data-body="${c.k}"></div>
+    </div>`).join("");
+  CATS.forEach(c=>renderCausas(c.k));
+}
+function renderCausas(k){
+  const body=document.querySelector(`[data-body="${k}"]`);
+  const lista=DADOS.ishikawa.cats[k];
+  body.innerHTML=lista.map((v,i)=>`<textarea class="cause" data-cat="${k}" data-i="${i}" placeholder="causa…">${esc(v)}</textarea>`).join("")
+    +`<button class="add-min" data-add="${k}">+ causa</button>`;
+}
+function montarPorques(){
+  const lbls=["1º Por quê?","2º Por quê?","3º Por quê?","4º Por quê?","5º Por quê?"];
+  document.getElementById("porq-lista").innerHTML=lbls.map((l,i)=>`
+    <div class="porq-row">
+      <div class="porq-num">${i+1}</div>
+      <div class="grow"><span class="lbl">${l}</span>
+        <textarea data-porq="${i}" rows="2" placeholder="Por que isso aconteceu?">${esc(DADOS.porques.porques[i])}</textarea></div>
+    </div>`).join("");
+}
+function renderNivel(nivel){
+  const cont=document.getElementById("arv-"+nivel);
+  cont.innerHTML=DADOS.arvore[nivel].map((v,i)=>`<textarea data-nivel="${nivel}" data-i="${i}" placeholder="fato concreto…">${esc(v)}</textarea>`).join("");
+}
+function montarArvore(){["imediatos","intermediarios","origem"].forEach(renderNivel);}
+
+/* ---------- plano de ação 5W2H ---------- */
+function renderPlano(){
+  const tb=document.getElementById("plano-body");
+  const acoes=DADOS[metodoAtivo].acoes;
+  tb.innerHTML=acoes.map((a,i)=>`
+    <tr>
+      <td class="nro">${i+1}</td>
+      <td><textarea data-ac="${i}" data-f="oque" rows="2">${esc(a.oque)}</textarea></td>
+      <td><textarea data-ac="${i}" data-f="porque" rows="2">${esc(a.porque)}</textarea></td>
+      <td><input data-ac="${i}" data-f="onde" value="${escAttr(a.onde)}"></td>
+      <td><input data-ac="${i}" data-f="quem" value="${escAttr(a.quem)}"></td>
+      <td><input type="date" data-ac="${i}" data-f="quando" value="${escAttr(a.quando)}"></td>
+      <td><textarea data-ac="${i}" data-f="como" rows="2">${esc(a.como)}</textarea></td>
+      <td><input data-ac="${i}" data-f="quanto" value="${escAttr(a.quanto)}"></td>
+      <td><select data-ac="${i}" data-f="status" class="st">${STATUS.map(s=>`<option ${s===a.status?"selected":""}>${s}</option>`).join("")}</select></td>
+      <td class="col-del"><button data-del="${i}" title="Remover">✕</button></td>
+    </tr>`).join("");
+  pintarStatus();
+}
+function pintarStatus(){
+  document.querySelectorAll("#plano-body select").forEach(s=>{
+    const c={"Não iniciado":"#5b6b7a","Em andamento":"#a16207","Concluído":"#0f7a4d","Atrasado":"#b42318"}[s.value]||"#13212e";
+    s.style.color=c;
+  });
+}
+
+/* ---------- evidências ---------- */
+function renderEvid(){
+  const g=document.getElementById("evid-grid");
+  g.innerHTML=EVID[metodoAtivo].map((src,i)=>`
+    <div class="evid-thumb"><img src="${src}"><button data-evdel="${i}">✕</button></div>`).join("");
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+
+/* ============================================================
+   COLETA (DOM -> DADOS) e CARGA (DADOS -> DOM)
+   ============================================================ */
+function coletar(){
+  // ishikawa
+  DADOS.ishikawa.efeito=val("ish-efeito");
+  CATS.forEach(c=>{
+    DADOS.ishikawa.cats[c.k]=[...document.querySelectorAll(`.cause[data-cat="${c.k}"]`)].map(t=>t.value);
+  });
+  // porques
+  DADOS.porques.problema=val("porq-problema");
+  DADOS.porques.porques=[...document.querySelectorAll("[data-porq]")].map(t=>t.value);
+  DADOS.porques.raiz=val("porq-raiz");
+  // arvore
+  DADOS.arvore.acidente=val("arv-acidente");
+  ["imediatos","intermediarios","origem"].forEach(nv=>{
+    DADOS.arvore[nv]=[...document.querySelectorAll(`textarea[data-nivel="${nv}"]`)].map(t=>t.value);
+  });
+  // pasta + ações do método ativo
+  DADOS[metodoAtivo].pasta=val("evid-pasta");
+  DADOS[metodoAtivo].acoes=[...document.querySelectorAll("#plano-body tr")].map(tr=>({
+    oque:tr.querySelector('[data-f="oque"]').value,
+    porque:tr.querySelector('[data-f="porque"]').value,
+    onde:tr.querySelector('[data-f="onde"]').value,
+    quem:tr.querySelector('[data-f="quem"]').value,
+    quando:tr.querySelector('[data-f="quando"]').value,
+    como:tr.querySelector('[data-f="como"]').value,
+    quanto:tr.querySelector('[data-f="quanto"]').value,
+    status:tr.querySelector('[data-f="status"]').value
+  }));
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+
+function estadoCompleto(){
+  coletar();
+  return {
+    header:{empresa:val("h-empresa"),responsavel:val("h-responsavel"),data:val("h-data"),registro:val("h-registro")},
+    dados:DADOS, evid:EVID, metodoAtivo
+  };
+}
+function carregar(st){
+  if(!st)return;
+  const h=st.header||{};
+  setVal("h-empresa",h.empresa);setVal("h-responsavel",h.responsavel);setVal("h-data",h.data);setVal("h-registro",h.registro);
+  if(st.dados){
+    Object.assign(DADOS.ishikawa,st.dados.ishikawa||{});
+    Object.assign(DADOS.porques,st.dados.porques||{});
+    Object.assign(DADOS.arvore,st.dados.arvore||{});
+  }
+  if(st.evid){METODOS.forEach(m=>EVID[m]=st.evid[m]||[]);}
+  // re-render tudo
+  setVal("ish-efeito",DADOS.ishikawa.efeito);
+  CATS.forEach(c=>{if(!DADOS.ishikawa.cats[c.k]||!DADOS.ishikawa.cats[c.k].length)DADOS.ishikawa.cats[c.k]=[""];renderCausas(c.k);});
+  setVal("porq-problema",DADOS.porques.problema);
+  if(!DADOS.porques.porques||DADOS.porques.porques.length<5)DADOS.porques.porques=["","","","",""];
+  montarPorques();setVal("porq-raiz",DADOS.porques.raiz);
+  setVal("arv-acidente",DADOS.arvore.acidente);
+  ["imediatos","intermediarios","origem"].forEach(nv=>{if(!DADOS.arvore[nv]||!DADOS.arvore[nv].length)DADOS.arvore[nv]=[""];});
+  montarArvore();
+  trocarMetodo(st.metodoAtivo||"ishikawa");
+}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+
+/* ============================================================
+   TROCA DE MÉTODO (cada um tem sua pasta/evidências/ações)
+   ============================================================ */
+function trocarMetodo(m){
+  coletar();              // salva o que estava na tela do método anterior
+  metodoAtivo=m;
+  document.querySelectorAll(".aba").forEach(a=>a.classList.toggle("ativa",a.dataset.m===m));
+  document.querySelectorAll(".painel").forEach(p=>p.classList.remove("ativo"));
+  document.getElementById("p-"+m).classList.add("ativo");
+  setVal("evid-pasta",DADOS[m].pasta);
+  if(!DADOS[m].acoes||!DADOS[m].acoes.length)DADOS[m].acoes=[novaAcao()];
+  renderPlano();renderEvid();
+}
+function novaAcao(){return{oque:"",porque:"",onde:"",quem:"",quando:"",como:"",quanto:"",status:"Não iniciado"};}
+
+/* ============================================================
+   AUTO-SAVE
+   ============================================================ */
+let tmr;
+function autosave(){
+  clearTimeout(tmr);
+  tmr=setTimeout(()=>{
+    try{localStorage.setItem(STORE,JSON.stringify(estadoCompleto()));
+      const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);
+    }catch(e){console.warn("autosave falhou (fotos grandes?)",e);}
+  },500);
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+document.addEventListener("input",e=>{
+  if(e.target.matches('[data-ac] [data-f="status"]')) {} // status handled below
+  if(e.target.tagName==="SELECT")pintarStatus();
+  autosave();
+});
+document.querySelectorAll(".aba").forEach(a=>a.addEventListener("click",()=>{trocarMetodo(a.dataset.m);autosave();}));
+
+document.addEventListener("click",e=>{
+  // adicionar causa (ishikawa)
+  if(e.target.dataset.add){const k=e.target.dataset.add;coletar();DADOS.ishikawa.cats[k].push("");renderCausas(k);autosave();}
+  // adicionar caixa (arvore)
+  if(e.target.dataset.nivel&&e.target.classList.contains("add-box")){const nv=e.target.dataset.nivel;coletar();DADOS.arvore[nv].push("");renderNivel(nv);autosave();}
+  // remover ação
+  if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){coletar();DADOS[metodoAtivo].acoes.splice(+e.target.dataset.del,1);if(!DADOS[metodoAtivo].acoes.length)DADOS[metodoAtivo].acoes=[novaAcao()];renderPlano();autosave();}
+  // remover evidência
+  if(e.target.dataset.evdel!=null){EVID[metodoAtivo].splice(+e.target.dataset.evdel,1);renderEvid();autosave();}
+});
+document.getElementById("add-acao").addEventListener("click",()=>{coletar();DADOS[metodoAtivo].acoes.push(novaAcao());renderPlano();autosave();});
+
+// fotos
+document.getElementById("evid-input").addEventListener("change",e=>{
+  const files=[...e.target.files];
+  let pend=files.length;
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=()=>{EVID[metodoAtivo].push(r.result);if(--pend===0){renderEvid();autosave();}};
+    r.readAsDataURL(f);
+  });
+  e.target.value="";
+});
+
+// salvar / abrir / pdf / limpar
+document.getElementById("btn-salvar").addEventListener("click",()=>{
+  const st=estadoCompleto();
+  const nome=(st.header.registro||st.header.empresa||"investigacao").replace(/[^\w\-]+/g,"_");
+  const blob=new Blob([JSON.stringify(st,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="investigacao_"+nome+".json";a.click();
+});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};
+  r.readAsText(f);e.target.value="";
+});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{
+  if(!confirm("Isso vai apagar TODO o conteúdo desta investigação. Deseja continuar?"))return;
+  localStorage.removeItem(STORE);location.reload();
+});
+
+/* ============================================================
+   INÍCIO
+   ============================================================ */
+montarFishbone();montarPorques();montarArvore();
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){trocarMetodo("ishikawa");}}
+else{trocarMetodo("ishikawa");}
+// abrir aba conforme link do portal (#ishikawa / #porques / #arvore)
+const hash=(location.hash||"").replace("#","");
+if(METODOS.includes(hash))trocarMetodo(hash);
+</script>
+</body>
+</html>
