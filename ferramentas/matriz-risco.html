@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matriz de Risco 5×5 | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+    --n-baixo:#16a34a;--n-moderado:#eab308;--n-alto:#f97316;--n-extremo:#dc2626;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+
+  .cols{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start}
+  @media(max-width:860px){.cols{grid-template-columns:1fr}}
+
+  /* ===== MATRIZ ===== */
+  .matriz-wrap{display:flex;gap:8px}
+  .eixo-y{display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;font-size:12px;color:var(--cinza);letter-spacing:1px}
+  table.matriz{border-collapse:collapse}
+  table.matriz td,table.matriz th{width:62px;height:54px;text-align:center;border:2px solid #fff;font-weight:700}
+  table.matriz th{background:none;color:var(--cinza);font-size:12px;width:auto;height:auto;padding:6px}
+  .cel{color:#fff;font-size:15px;cursor:default;position:relative;border-radius:6px}
+  .cel small{display:block;font-size:9.5px;font-weight:600;opacity:.85}
+  .cel .cnt{position:absolute;top:2px;right:4px;background:#fff;color:#13212e;font-size:10px;font-weight:800;border-radius:999px;padding:0 5px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .eixo-x{text-align:center;font-weight:800;font-size:12px;color:var(--cinza);letter-spacing:1px;margin-top:6px}
+  .cantos{font-size:10px;color:var(--cinza);font-weight:600}
+
+  /* legenda de níveis */
+  .niveis{display:flex;flex-direction:column;gap:8px}
+  .nivel-item{display:flex;gap:10px;align-items:flex-start;font-size:12.5px}
+  .nivel-cor{flex:none;width:18px;height:18px;border-radius:5px;margin-top:1px}
+  .nivel-item b{display:block}
+  .nivel-item span{color:var(--cinza)}
+
+  /* escalas */
+  .escala{width:100%}
+  .escala h4{font-size:12.5px;color:var(--azul-900);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px}
+  table.esc{border-collapse:collapse;width:100%;font-size:12.5px;margin-bottom:16px}
+  table.esc td{border:1px solid var(--linha);padding:6px 9px;vertical-align:top}
+  table.esc td.n{width:34px;text-align:center;font-weight:800;color:#fff}
+
+  /* ===== REGISTRO ===== */
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.reg{border-collapse:collapse;width:100%;min-width:880px;font-size:13px}
+  table.reg th{background:var(--azul-900);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left}
+  table.reg td{border-bottom:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.reg tr:nth-child(even) td{background:#fafcfe}
+  table.reg .nro{text-align:center;font-weight:800;color:var(--cinza);width:32px}
+  table.reg textarea,table.reg input,table.reg select{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 7px;font-family:inherit;font-size:13px;resize:vertical;background:transparent}
+  table.reg textarea:focus,table.reg input:focus,table.reg select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.reg select{cursor:pointer;text-align:center}
+  .ps{width:60px}
+  .nivel-badge{display:inline-block;min-width:90px;text-align:center;padding:6px 8px;border-radius:8px;font-weight:800;font-size:11.5px;color:#fff;line-height:1.2}
+  .nivel-badge small{display:block;font-weight:600;font-size:10px;opacity:.9}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:17px;padding:4px 6px}
+  .add-row{margin-top:10px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+
+  footer{max-width:1180px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+
+  @media print{
+    header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}
+    .card{box-shadow:none;border:1px solid #ccc}
+    main{max-width:100%;padding:0}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Matriz de Risco<span>Avaliação de risco 5×5 · Probabilidade × Severidade</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Atividade / Área avaliada</label><input id="h-atividade" data-save></div>
+    <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+  </div>
+
+  <div class="secao">📊 A Matriz</div>
+  <div class="card">
+    <div class="cols">
+      <div>
+        <div class="matriz-wrap">
+          <div class="eixo-y">SEVERIDADE →</div>
+          <div>
+            <table class="matriz" id="matriz"></table>
+            <div class="eixo-x">PROBABILIDADE →</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="secao" style="margin-top:0">Níveis de risco</div>
+        <div class="niveis" id="niveis"></div>
+        <div class="hint" style="margin-top:14px;margin-bottom:0">O número em cada quadrado é <b>Probabilidade × Severidade</b>. Quanto maior, mais grave. Os riscos que você cadastrar abaixo aparecem marcados na matriz (bolinha branca com a contagem).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="secao">📏 Escalas (como pontuar)</div>
+  <div class="card">
+    <div class="cols" style="grid-template-columns:1fr 1fr">
+      <div class="escala"><h4>Probabilidade — qual a chance de acontecer?</h4><table class="esc" id="esc-prob"></table></div>
+      <div class="escala"><h4>Severidade — quão grave é a consequência?</h4><table class="esc" id="esc-sev"></table></div>
+    </div>
+  </div>
+
+  <div class="secao">📋 Avaliação dos Riscos</div>
+  <div class="card">
+    <div class="hint">Para cada risco: descreva a atividade/perigo, escolha a Probabilidade e a Severidade (de 1 a 5). O <b>Nível</b> é calculado automaticamente.</div>
+    <div class="tabela-wrap">
+      <table class="reg">
+        <thead><tr>
+          <th class="nro">Nº</th><th>Atividade / Perigo</th><th>Risco (o que pode acontecer)</th>
+          <th class="ps">Prob.</th><th class="ps">Sev.</th><th>Nível</th><th>Medidas de controle</th><th></th>
+        </tr></thead>
+        <tbody id="reg-body"></tbody>
+      </table>
+    </div>
+    <button class="btn add-row" id="add-risco">+ Adicionar risco</button>
+  </div>
+</main>
+
+<footer>
+  SGI — Sistema de Gestão Integrada · Matriz de Risco<br>
+  Desenvolvido por <b>Júlio César Moura de Oliveira</b>
+</footer>
+
+<script>
+/* ============================================================
+   Matriz de Risco 5×5. Nível = Probabilidade × Severidade.
+   Tudo salvo automaticamente no navegador; exporta/importa .json
+   e imprime em PDF.
+   ============================================================ */
+const PROB = [
+  {n:1,t:"Raro",d:"Pode ocorrer só em circunstâncias excepcionais."},
+  {n:2,t:"Pouco provável",d:"Pode ocorrer raramente."},
+  {n:3,t:"Possível",d:"Pode ocorrer ocasionalmente."},
+  {n:4,t:"Provável",d:"Provavelmente ocorre na maioria das situações."},
+  {n:5,t:"Quase certo",d:"Espera-se que ocorra na maioria das vezes."}
+];
+const SEV = [
+  {n:1,t:"Insignificante",d:"Sem lesão ou apenas primeiros socorros."},
+  {n:2,t:"Leve",d:"Lesão leve, tratamento ambulatorial, sem afastamento."},
+  {n:3,t:"Moderada",d:"Lesão com afastamento / incapacidade temporária."},
+  {n:4,t:"Grave",d:"Lesão grave / incapacidade permanente."},
+  {n:5,t:"Catastrófica",d:"Óbito ou múltiplas fatalidades."}
+];
+function nivel(score){
+  if(score<=4) return {nome:"Baixo",cor:"var(--n-baixo)",hex:"#16a34a",acao:"Risco aceitável — manter e monitorar os controles."};
+  if(score<=9) return {nome:"Moderado",cor:"var(--n-moderado)",hex:"#eab308",acao:"Reduzir o risco em prazo planejado; reforçar controles."};
+  if(score<=14) return {nome:"Alto",cor:"var(--n-alto)",hex:"#f97316",acao:"Ação prioritária; só executar com controles adicionais."};
+  return {nome:"Extremo",cor:"var(--n-extremo)",hex:"#dc2626",acao:"Inaceitável — interromper / não iniciar até reduzir o risco."};
+}
+function corTexto(score){ return score>=5&&score<=9 ? "#5c4a06" : "#fff"; } // moderado(amarelo) usa texto escuro
+
+const STORE = "sgi_matriz_risco";
+let DADOS = {header:{}, riscos:[]};
+
+/* ---- montar a matriz visual ---- */
+function montarMatriz(){
+  const t=document.getElementById("matriz");
+  let html="";
+  // cabeçalho de colunas (probabilidade 1..5) — primeiro célula vazia do canto
+  html+="<tr><th class='cantos'></th>";
+  for(let p=1;p<=5;p++) html+=`<th>${p}</th>`;
+  html+="</tr>";
+  // linhas: severidade de 5 (topo) até 1 (base)
+  for(let s=5;s>=1;s--){
+    html+=`<tr><th>${s}</th>`;
+    for(let p=1;p<=5;p++){
+      const sc=p*s;const nv=nivel(sc);
+      html+=`<td><div class="cel" data-cel="${p}-${s}" style="background:${nv.hex};color:${corTexto(sc)}">${sc}<small>${nv.nome}</small></div></td>`;
+    }
+    html+="</tr>";
+  }
+  t.innerHTML=html;
+}
+function montarNiveis(){
+  const faixas=[
+    {sc:3,r:"1 – 4"},{sc:7,r:"5 – 9"},{sc:12,r:"10 – 14"},{sc:20,r:"15 – 25"}
+  ];
+  document.getElementById("niveis").innerHTML=faixas.map(f=>{
+    const nv=nivel(f.sc);
+    return `<div class="nivel-item"><span class="nivel-cor" style="background:${nv.hex}"></span><div><b>${nv.nome} <span style="color:var(--cinza);font-weight:600">(${f.r})</span></b><span>${nv.acao}</span></div></div>`;
+  }).join("");
+}
+function montarEscalas(){
+  document.getElementById("esc-prob").innerHTML=PROB.map(x=>{
+    const c=nivel(x.n*1).hex; // só pra dar uma cor de referência (não é o nível final)
+    return `<tr><td class="n" style="background:var(--azul-500)">${x.n}</td><td><b>${x.t}</b> — ${x.d}</td></tr>`;
+  }).join("");
+  document.getElementById("esc-sev").innerHTML=SEV.map(x=>{
+    return `<tr><td class="n" style="background:var(--azul-700)">${x.n}</td><td><b>${x.t}</b> — ${x.d}</td></tr>`;
+  }).join("");
+}
+
+/* ---- registro de riscos ---- */
+function novoRisco(){return{atividade:"",evento:"",p:1,s:1,medidas:""};}
+function opcoes(sel){return [1,2,3,4,5].map(n=>`<option ${n==sel?"selected":""}>${n}</option>`).join("");}
+function renderRegistro(){
+  const tb=document.getElementById("reg-body");
+  tb.innerHTML=DADOS.riscos.map((r,i)=>{
+    const sc=r.p*r.s;const nv=nivel(sc);
+    return `<tr>
+      <td class="nro">${i+1}</td>
+      <td><textarea data-i="${i}" data-f="atividade" rows="2">${esc(r.atividade)}</textarea></td>
+      <td><textarea data-i="${i}" data-f="evento" rows="2">${esc(r.evento)}</textarea></td>
+      <td><select class="ps" data-i="${i}" data-f="p">${opcoes(r.p)}</select></td>
+      <td><select class="ps" data-i="${i}" data-f="s">${opcoes(r.s)}</select></td>
+      <td><span class="nivel-badge" style="background:${nv.hex};color:${corTexto(sc)}">${nv.nome}<small>P${r.p}×S${r.s} = ${sc}</small></span></td>
+      <td><textarea data-i="${i}" data-f="medidas" rows="2">${esc(r.medidas)}</textarea></td>
+      <td class="col-del"><button data-del="${i}" title="Remover">✕</button></td>
+    </tr>`;
+  }).join("");
+  pintarMatriz();
+}
+function pintarMatriz(){
+  document.querySelectorAll(".cel .cnt").forEach(e=>e.remove());
+  const cont={};
+  DADOS.riscos.forEach(r=>{const k=r.p+"-"+r.s;cont[k]=(cont[k]||0)+1;});
+  Object.keys(cont).forEach(k=>{
+    const cel=document.querySelector(`.cel[data-cel="${k}"]`);
+    if(cel){const b=document.createElement("span");b.className="cnt";b.textContent=cont[k];cel.appendChild(b);}
+  });
+}
+
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---- coletar / carregar ---- */
+function coletar(){
+  DADOS.header={empresa:val("h-empresa"),atividade:val("h-atividade"),responsavel:val("h-responsavel"),data:val("h-data")};
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function carregar(st){
+  if(!st)return;
+  DADOS=st;
+  const h=DADOS.header||{};
+  setVal("h-empresa",h.empresa);setVal("h-atividade",h.atividade);setVal("h-responsavel",h.responsavel);setVal("h-data",h.data);
+  if(!DADOS.riscos||!DADOS.riscos.length)DADOS.riscos=[novoRisco()];
+  renderRegistro();
+}
+
+let tmr;
+function autosave(){
+  clearTimeout(tmr);
+  tmr=setTimeout(()=>{
+    coletar();
+    try{localStorage.setItem(STORE,JSON.stringify(DADOS));
+      const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);
+    }catch(e){console.warn(e);}
+  },400);
+}
+
+/* ---- eventos ---- */
+document.addEventListener("input",e=>{
+  const i=e.target.dataset.i, f=e.target.dataset.f;
+  if(i!=null&&f){
+    DADOS.riscos[+i][f]= (f==="p"||f==="s") ? +e.target.value : e.target.value;
+    if(f==="p"||f==="s"){renderRegistro();} // recalcula nível + matriz
+  }
+  autosave();
+});
+document.getElementById("add-risco").addEventListener("click",()=>{DADOS.riscos.push(novoRisco());renderRegistro();autosave();});
+document.addEventListener("click",e=>{
+  if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){
+    DADOS.riscos.splice(+e.target.dataset.del,1);
+    if(!DADOS.riscos.length)DADOS.riscos=[novoRisco()];
+    renderRegistro();autosave();
+  }
+});
+
+document.getElementById("btn-salvar").addEventListener("click",()=>{
+  coletar();
+  const nome=(DADOS.header.empresa||DADOS.header.atividade||"matriz").replace(/[^\w\-]+/g,"_");
+  const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="matriz_risco_"+nome+".json";a.click();
+});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};
+  r.readAsText(f);e.target.value="";
+});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{
+  if(!confirm("Isso vai apagar TODA esta avaliação. Deseja continuar?"))return;
+  localStorage.removeItem(STORE);location.reload();
+});
+
+/* ---- início ---- */
+montarMatriz();montarNiveis();montarEscalas();
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){DADOS.riscos=[novoRisco()];renderRegistro();}}
+else{DADOS.riscos=[novoRisco()];renderRegistro();}
+</script>
+</body>
+</html>
