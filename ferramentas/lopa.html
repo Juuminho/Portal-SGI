@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOPA — Análise de Camadas de Proteção | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:14px}
+  .hint b{color:var(--azul-700)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input,.campo textarea{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe;resize:vertical}
+  .campo input:focus,.campo textarea:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .campo .un{font-size:11px;color:var(--cinza);font-weight:500}
+  /* IPLs */
+  table.t{border-collapse:collapse;width:100%;font-size:13.5px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:32px}
+  table.t textarea,table.t input{width:100%;border:1px solid transparent;border-radius:6px;padding:7px 8px;font-family:inherit;font-size:13.5px;resize:vertical;background:transparent}
+  table.t textarea:focus,table.t input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  td.pfd{width:130px}
+  td.pfd input{text-align:center;font-weight:600}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  /* resultado */
+  .res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .res-box{border:1px solid var(--linha);border-radius:12px;padding:14px;background:#fff;text-align:center}
+  .res-box span{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:6px}
+  .res-box b{font-size:20px;font-weight:800;color:var(--azul-900)}
+  .res-box small{display:block;font-size:11.5px;color:var(--cinza);margin-top:4px}
+  .veredito{margin-top:14px;border-radius:12px;padding:16px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:12px}
+  .veredito .ic{font-size:26px}
+  .veredito.ok{background:#dcfce7;color:#0f7a4d;border:1px solid #86efac}
+  .veredito.nao{background:#fee2e2;color:#b42318;border:1px solid #fca5a5}
+  .veredito small{display:block;font-weight:500;font-size:13px;margin-top:3px;opacity:.95}
+  footer{max-width:1080px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">LOPA — Camadas de Proteção<span>Verifica se as barreiras reduzem o risco até o nível tolerável</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="secao">🗂️ Identificação</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo"><label>Empresa / Planta</label><input id="h-empresa" data-save></div>
+      <div class="campo"><label>Nó / Sistema</label><input id="h-no" data-save></div>
+      <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+      <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+    </div>
+  </div>
+
+  <div class="secao">🎯 Cenário</div>
+  <div class="card">
+    <div class="hint">A LOPA pega <b>um cenário</b> (um evento que pode causar dano) e verifica se as camadas de proteção existentes reduzem a frequência dele até um nível <b>tolerável</b>. Use frequências em <b>eventos por ano</b> — pode escrever decimal (0,01) ou notação científica (1e-2).</div>
+    <div class="grid">
+      <div class="campo" style="grid-column:1/-1"><label>Descrição do cenário (consequência)</label><textarea id="c-descricao" rows="2" data-calc placeholder="ex.: Sobrepressão no vaso V-101 levando a ruptura e vazamento inflamável"></textarea></div>
+      <div class="campo" style="grid-column:1/-1"><label>Evento iniciador</label><input id="c-evento" data-calc placeholder="ex.: Falha da malha de controle de pressão (BPCS)"></div>
+      <div class="campo"><label>Frequência do evento iniciador <span class="un">(eventos/ano)</span></label><input id="c-freq" data-calc list="dl-freq" placeholder="ex.: 0,1"></div>
+      <div class="campo"><label>Frequência alvo tolerável <span class="un">(eventos/ano)</span></label><input id="c-alvo" data-calc list="dl-alvo" placeholder="ex.: 1e-4"></div>
+    </div>
+    <datalist id="dl-freq"><option value="0,1"><option value="0,01"><option value="1e-3"><option value="1e-4"><option value="1e-5"></datalist>
+    <datalist id="dl-alvo"><option value="1e-3"><option value="1e-4"><option value="1e-5"><option value="1e-6"></datalist>
+  </div>
+
+  <div class="secao">🛡️ Camadas de proteção independentes (IPLs)</div>
+  <div class="card">
+    <div class="hint">Liste cada barreira <b>independente</b> que reduz a frequência. O <b>PFD</b> é a probabilidade de a barreira falhar quando exigida (quanto menor, melhor). Valores típicos: alarme + ação do operador <b>0,1</b>; válvula de alívio (PSV) <b>0,01</b>; intertravamento/SIS <b>0,1 a 0,01</b>; dique de contenção <b>0,01</b>.</div>
+    <table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Camada de proteção / barreira</th><th>PFD</th><th></th></tr></thead>
+      <tbody id="ipl-body"></tbody>
+    </table>
+    <button class="btn add-row" id="add-ipl">+ Adicionar camada</button>
+  </div>
+
+  <div class="secao">📊 Resultado</div>
+  <div class="card">
+    <div class="res-grid">
+      <div class="res-box"><span>Freq. do iniciador</span><b id="r-init">—</b><small>eventos/ano</small></div>
+      <div class="res-box"><span>Redução das camadas</span><b id="r-rrf">—</b><small id="r-rrf-sub">fator total</small></div>
+      <div class="res-box"><span>Freq. mitigada</span><b id="r-mit">—</b><small id="r-mit-sub">com as barreiras</small></div>
+      <div class="res-box"><span>Freq. alvo</span><b id="r-alvo">—</b><small>tolerável</small></div>
+    </div>
+    <div class="veredito" id="veredito" style="display:none"><div class="ic" id="v-ic"></div><div id="v-txt"></div></div>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · LOPA — Análise de Camadas de Proteção<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const STORE="sgi_lopa";
+let DADOS={header:{},cenario:{},ipls:[]};
+function novaIPL(){return{desc:"",pfd:""};}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+/* aceita "0,01" e "1e-2" */
+function num(s){if(s==null)return NaN;const v=parseFloat(String(s).replace(",","."));return isNaN(v)?NaN:v;}
+function fmtFreq(f){if(f==null||isNaN(f)||f<=0)return "—";return f.toExponential(1).replace("e","×10^").replace("^-","⁻").replace("^+","");}
+function fmtNum(n){if(!isFinite(n))return "—";if(n>=1000)return Math.round(n).toLocaleString("pt-BR");return (Math.round(n*10)/10).toLocaleString("pt-BR");}
+function anos(f){if(!f||f<=0)return "";const a=1/f;return "~1 evento a cada "+fmtNum(a)+" anos";}
+function silSugerido(rrf){
+  if(rrf<=1)return null;
+  if(rrf<=10)return {sil:"Sem SIL",txt:"Uma barreira simples adicional (não-instrumentada) já pode ser suficiente."};
+  if(rrf<=100)return {sil:"SIL 1",txt:"Recomenda-se uma função instrumentada de segurança nível SIL 1."};
+  if(rrf<=1000)return {sil:"SIL 2",txt:"Recomenda-se uma função instrumentada de segurança nível SIL 2."};
+  if(rrf<=10000)return {sil:"SIL 3",txt:"Recomenda-se uma função instrumentada de segurança nível SIL 3."};
+  return {sil:"SIL 4 / rever projeto",txt:"Redução muito alta exigida — reavaliar o projeto ou reduzir a severidade."};
+}
+
+function renderIPL(){
+  document.getElementById("ipl-body").innerHTML=DADOS.ipls.map((e,i)=>`
+    <tr>
+      <td class="nro">${i+1}</td>
+      <td><textarea data-i="${i}" data-f="desc" rows="1">${esc(e.desc)}</textarea></td>
+      <td class="pfd"><input data-i="${i}" data-f="pfd" value="${escAttr(e.pfd)}" placeholder="ex.: 0,1"></td>
+      <td class="col-del"><button data-del="${i}">✕</button></td>
+    </tr>`).join("");
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+
+function calcular(){
+  const fi=num(val("c-freq"));
+  const alvo=num(val("c-alvo"));
+  // produto dos PFDs
+  let prod=1, temPFD=false;
+  DADOS.ipls.forEach(e=>{const p=num(e.pfd);if(!isNaN(p)&&p>0){prod*=p;temPFD=true;}});
+  const rrf = temPFD ? 1/prod : 1;
+  const mit = !isNaN(fi) ? fi*prod : NaN;
+
+  document.getElementById("r-init").textContent=fmtFreq(fi);
+  document.getElementById("r-rrf").textContent= temPFD ? fmtNum(rrf)+"×" : "—";
+  document.getElementById("r-mit").textContent=fmtFreq(mit);
+  document.getElementById("r-mit-sub").textContent=!isNaN(mit)?anos(mit):"com as barreiras";
+  document.getElementById("r-alvo").textContent=fmtFreq(alvo);
+
+  const vEl=document.getElementById("veredito");
+  if(isNaN(fi)||isNaN(alvo)){vEl.style.display="none";return;}
+  vEl.style.display="flex";
+  if(mit<=alvo){
+    vEl.className="veredito ok";
+    document.getElementById("v-ic").textContent="✅";
+    document.getElementById("v-txt").innerHTML="Risco tolerável — as camadas atuais já reduzem a frequência abaixo do alvo.<small>"+anos(mit)+" (alvo: "+anos(alvo)+")</small>";
+  }else{
+    const fatorFalta=mit/alvo;
+    const sil=silSugerido(fatorFalta);
+    vEl.className="veredito nao";
+    document.getElementById("v-ic").textContent="⚠️";
+    let txt="Precisa de mais proteção — falta reduzir cerca de <b>"+fmtNum(fatorFalta)+"×</b> para atingir o alvo.";
+    if(sil)txt+="<small>Sugestão: "+sil.sil+" — "+sil.txt+"</small>";
+    document.getElementById("v-txt").innerHTML=txt;
+  }
+}
+
+function coletar(){
+  DADOS.header={empresa:val("h-empresa"),no:val("h-no"),responsavel:val("h-responsavel"),data:val("h-data")};
+  DADOS.cenario={descricao:val("c-descricao"),evento:val("c-evento"),freq:val("c-freq"),alvo:val("c-alvo")};
+  DADOS.ipls=[...document.querySelectorAll("#ipl-body tr")].map(tr=>({desc:tr.querySelector('[data-f="desc"]').value,pfd:tr.querySelector('[data-f="pfd"]').value}));
+}
+function carregar(st){
+  if(!st)return;DADOS=st;if(!DADOS.ipls)DADOS.ipls=[];
+  const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-no",h.no);setVal("h-responsavel",h.responsavel);setVal("h-data",h.data);
+  const c=DADOS.cenario||{};setVal("c-descricao",c.descricao);setVal("c-evento",c.evento);setVal("c-freq",c.freq);setVal("c-alvo",c.alvo);
+  if(!DADOS.ipls.length)DADOS.ipls=[novaIPL()];
+  renderIPL();calcular();
+}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+
+document.addEventListener("input",e=>{
+  const i=e.target.dataset.i,f=e.target.dataset.f;
+  if(i!=null&&f){DADOS.ipls[+i][f]=e.target.value;}
+  calcular();autosave();
+});
+document.getElementById("add-ipl").addEventListener("click",()=>{coletar();DADOS.ipls.push(novaIPL());renderIPL();calcular();autosave();});
+document.addEventListener("click",e=>{if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){coletar();DADOS.ipls.splice(+e.target.dataset.del,1);if(!DADOS.ipls.length)DADOS.ipls=[novaIPL()];renderIPL();calcular();autosave();}});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.no||DADOS.header.empresa||"lopa").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="lopa_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA esta LOPA. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){DADOS.ipls=[novaIPL()];renderIPL();calcular();}}else{DADOS.ipls=[novaIPL()];renderIPL();calcular();}
+</script>
+</body>
+</html>
