@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What If (E se…?) — Análise de Riscos | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1280px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .legenda{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--cinza)}
+  .legenda span{display:inline-flex;align-items:center;gap:6px}
+  .lg-cor{width:14px;height:14px;border-radius:4px}
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.t{border-collapse:collapse;width:100%;min-width:1080px;font-size:12.5px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:8px 7px;text-align:center;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:4px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:30px}
+  table.t textarea,table.t select{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 6px;font-family:inherit;font-size:12.5px;resize:vertical;background:transparent}
+  table.t textarea{min-height:48px}
+  table.t textarea:focus,table.t select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.t select{cursor:pointer;text-align:center;width:48px;padding:6px 2px}
+  td.ps{text-align:center}
+  .nivel-badge{display:inline-block;min-width:72px;text-align:center;padding:5px 6px;border-radius:7px;font-weight:800;font-size:10.5px;color:#fff;line-height:1.15}
+  .nivel-badge small{display:block;font-weight:600;font-size:9px;opacity:.9}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  footer{max-width:1280px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}table.t{min-width:0;width:100%;font-size:10px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">What If — “E se…?”<span>Análise de cenários por perguntas estruturadas</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Sistema / Processo</label><input id="h-sistema" data-save></div>
+    <div class="campo"><label>Área / Nó analisado</label><input id="h-area" data-save></div>
+    <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+    <div class="campo"><label>Equipe</label><input id="h-equipe" data-save></div>
+  </div>
+  <div class="secao">❔ Cenários “E se…?”</div>
+  <div class="card">
+    <div class="hint">Pergunte “<b>E se…?</b>” sobre falhas ou desvios possíveis (ex.: “E se a bomba parar?”). Para cada cenário registre causa, consequência, as salvaguardas que já existem, classifique o risco (P × S) e proponha ações.</div>
+    <div class="legenda">
+      <span><i class="lg-cor" style="background:#16a34a"></i> Baixo (1–4)</span>
+      <span><i class="lg-cor" style="background:#eab308"></i> Moderado (5–9)</span>
+      <span><i class="lg-cor" style="background:#f97316"></i> Alto (10–14)</span>
+      <span><i class="lg-cor" style="background:#dc2626"></i> Extremo (15–25)</span>
+    </div>
+    <div class="tabela-wrap">
+      <table class="t">
+        <thead><tr>
+          <th class="nro">Nº</th><th>E se…? (cenário)</th><th>Causa</th><th>Consequência</th><th>Salvaguardas existentes</th>
+          <th>P</th><th>S</th><th>Nível</th><th>Recomendações / Ações</th><th>Responsável / Prazo</th><th></th>
+        </tr></thead>
+        <tbody id="body"></tbody>
+      </table>
+    </div>
+    <button class="btn add-row" id="add-row">+ Adicionar cenário</button>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · What If (E se…?)<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+function nivel(sc){if(sc<=4)return{n:"Baixo",h:"#16a34a"};if(sc<=9)return{n:"Moderado",h:"#eab308"};if(sc<=14)return{n:"Alto",h:"#f97316"};return{n:"Extremo",h:"#dc2626"};}
+function corTexto(sc){return sc>=5&&sc<=9?"#5c4a06":"#fff";}
+function opcoes(sel){return [1,2,3,4,5].map(n=>`<option ${n==sel?"selected":""}>${n}</option>`).join("");}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function badge(p,s){const sc=p*s,nv=nivel(sc);return `<span class="nivel-badge" style="background:${nv.h};color:${corTexto(sc)}">${nv.n}<small>${sc}</small></span>`;}
+const STORE="sgi_whatif";
+let DADOS={header:{},linhas:[]};
+function nova(){return{cenario:"",causa:"",conseq:"",salv:"",p:1,s:1,acoes:"",resp:""};}
+function render(){
+  document.getElementById("body").innerHTML=DADOS.linhas.map((e,i)=>`
+    <tr>
+      <td class="nro">${i+1}</td>
+      <td><textarea data-i="${i}" data-f="cenario">${esc(e.cenario)}</textarea></td>
+      <td><textarea data-i="${i}" data-f="causa">${esc(e.causa)}</textarea></td>
+      <td><textarea data-i="${i}" data-f="conseq">${esc(e.conseq)}</textarea></td>
+      <td><textarea data-i="${i}" data-f="salv">${esc(e.salv)}</textarea></td>
+      <td class="ps"><select data-i="${i}" data-f="p">${opcoes(e.p)}</select></td>
+      <td class="ps"><select data-i="${i}" data-f="s">${opcoes(e.s)}</select></td>
+      <td class="ps">${badge(e.p,e.s)}</td>
+      <td><textarea data-i="${i}" data-f="acoes">${esc(e.acoes)}</textarea></td>
+      <td><textarea data-i="${i}" data-f="resp">${esc(e.resp)}</textarea></td>
+      <td class="col-del"><button data-del="${i}">✕</button></td>
+    </tr>`).join("");
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){DADOS.header={empresa:val("h-empresa"),sistema:val("h-sistema"),area:val("h-area"),responsavel:val("h-responsavel"),data:val("h-data"),equipe:val("h-equipe")};}
+function carregar(st){if(!st)return;DADOS=st;if(!DADOS.linhas)DADOS.linhas=[];const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-sistema",h.sistema);setVal("h-area",h.area);setVal("h-responsavel",h.responsavel);setVal("h-data",h.data);setVal("h-equipe",h.equipe);if(!DADOS.linhas.length)DADOS.linhas=[nova()];render();}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+document.addEventListener("input",e=>{const i=e.target.dataset.i,f=e.target.dataset.f;if(i!=null&&f){const num=["p","s"].includes(f);DADOS.linhas[+i][f]=num?+e.target.value:e.target.value;if(num)render();}autosave();});
+document.getElementById("add-row").addEventListener("click",()=>{DADOS.linhas.push(nova());render();autosave();});
+document.addEventListener("click",e=>{if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){DADOS.linhas.splice(+e.target.dataset.del,1);if(!DADOS.linhas.length)DADOS.linhas=[nova()];render();autosave();}});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.sistema||DADOS.header.empresa||"whatif").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="whatif_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA esta análise. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){DADOS.linhas=[nova()];render();}}else{DADOS.linhas=[nova()];render();}
+</script>
+</body>
+</html>

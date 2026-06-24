@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Operacional | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  /* resumo */
+  .resumo{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .resumo .box{flex:1;min-width:120px;border:1px solid var(--linha);border-radius:12px;padding:12px 14px;text-align:center;background:#fff}
+  .resumo .box b{display:block;font-size:24px;font-weight:800}
+  .resumo .box span{font-size:11.5px;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px}
+  .box.ok b{color:#16a34a}.box.nc b{color:#dc2626}.box.na b{color:#5b6b7a}.box.pc b{color:var(--azul-500)}
+  .barra{height:10px;border-radius:6px;background:#eef2f6;overflow:hidden;margin-top:8px}
+  .barra i{display:block;height:100%;background:linear-gradient(90deg,var(--verde-500),var(--verde-300));width:0}
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.t{border-collapse:collapse;width:100%;min-width:720px;font-size:13.5px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:32px}
+  table.t textarea,table.t select{width:100%;border:1px solid transparent;border-radius:6px;padding:7px 8px;font-family:inherit;font-size:13.5px;resize:vertical;background:transparent}
+  table.t textarea{min-height:40px}
+  table.t textarea:focus,table.t select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.t select{cursor:pointer;font-weight:700}
+  td.sit{width:150px}
+  select.s-ok{color:#16a34a}select.s-nc{color:#dc2626}select.s-na{color:#5b6b7a}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  footer{max-width:1080px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Checklist Operacional<span>Verificação item a item, com % de conformidade</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Atividade / Equipamento</label><input id="h-atividade" data-save></div>
+    <div class="campo"><label>Local</label><input id="h-local" data-save></div>
+    <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+  </div>
+
+  <div class="resumo" id="resumo">
+    <div class="box ok"><b id="r-ok">0</b><span>Conforme</span></div>
+    <div class="box nc"><b id="r-nc">0</b><span>Não conforme</span></div>
+    <div class="box na"><b id="r-na">0</b><span>N.A.</span></div>
+    <div class="box pc"><b id="r-pc">0%</b><span>Conformidade</span><div class="barra"><i id="r-barra"></i></div></div>
+  </div>
+
+  <div class="secao">✅ Itens de verificação</div>
+  <div class="card">
+    <div class="hint">Liste os itens a verificar. Marque <b>Conforme</b>, <b>Não conforme</b> ou <b>N.A.</b> (não se aplica). Use a coluna de observação para registrar o que precisa de ação. A % de conformidade considera só os itens que se aplicam.</div>
+    <div class="tabela-wrap">
+      <table class="t">
+        <thead><tr>
+          <th class="nro">Nº</th><th>Item de verificação</th><th class="sit">Situação</th><th>Observação / Ação</th><th></th>
+        </tr></thead>
+        <tbody id="body"></tbody>
+      </table>
+    </div>
+    <button class="btn add-row" id="add-row">+ Adicionar item</button>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Checklist Operacional<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const SIT=["— ","Conforme","Não conforme","N.A."];
+function classeSit(v){return v==="Conforme"?"s-ok":v==="Não conforme"?"s-nc":v==="N.A."?"s-na":"";}
+function optSit(sel){return SIT.map(s=>`<option ${s===sel?"selected":""}>${s}</option>`).join("");}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+const STORE="sgi_checklist";
+let DADOS={header:{},itens:[]};
+function nova(){return{item:"",sit:"— ",obs:""};}
+function render(){
+  document.getElementById("body").innerHTML=DADOS.itens.map((e,i)=>`
+    <tr>
+      <td class="nro">${i+1}</td>
+      <td><textarea data-i="${i}" data-f="item">${esc(e.item)}</textarea></td>
+      <td class="sit"><select class="${classeSit(e.sit)}" data-i="${i}" data-f="sit">${optSit(e.sit)}</select></td>
+      <td><textarea data-i="${i}" data-f="obs">${esc(e.obs)}</textarea></td>
+      <td class="col-del"><button data-del="${i}">✕</button></td>
+    </tr>`).join("");
+  atualizarResumo();
+}
+function atualizarResumo(){
+  let ok=0,nc=0,na=0;
+  DADOS.itens.forEach(e=>{if(e.sit==="Conforme")ok++;else if(e.sit==="Não conforme")nc++;else if(e.sit==="N.A.")na++;});
+  const aplicaveis=ok+nc;
+  const pc=aplicaveis? Math.round(ok/aplicaveis*100):0;
+  document.getElementById("r-ok").textContent=ok;
+  document.getElementById("r-nc").textContent=nc;
+  document.getElementById("r-na").textContent=na;
+  document.getElementById("r-pc").textContent=pc+"%";
+  document.getElementById("r-barra").style.width=pc+"%";
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){DADOS.header={empresa:val("h-empresa"),atividade:val("h-atividade"),local:val("h-local"),responsavel:val("h-responsavel"),data:val("h-data")};}
+function carregar(st){if(!st)return;DADOS=st;if(!DADOS.itens)DADOS.itens=[];const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-atividade",h.atividade);setVal("h-local",h.local);setVal("h-responsavel",h.responsavel);setVal("h-data",h.data);if(!DADOS.itens.length)DADOS.itens=[nova()];render();}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+document.addEventListener("input",e=>{const i=e.target.dataset.i,f=e.target.dataset.f;if(i!=null&&f){DADOS.itens[+i][f]=e.target.value;if(f==="sit"){e.target.className=classeSit(e.target.value);atualizarResumo();}}autosave();});
+document.getElementById("add-row").addEventListener("click",()=>{DADOS.itens.push(nova());render();autosave();});
+document.addEventListener("click",e=>{if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){DADOS.itens.splice(+e.target.dataset.del,1);if(!DADOS.itens.length)DADOS.itens=[nova()];render();autosave();}});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.atividade||DADOS.header.empresa||"checklist").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="checklist_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODO este checklist. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){DADOS.itens=[nova()];render();}}else{DADOS.itens=[nova()];render();}
+</script>
+</body>
+</html>
