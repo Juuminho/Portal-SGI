@@ -19,8 +19,9 @@
     --fundo:#f4f7fa;
     --branco:#ffffff;
     --sombra:0 8px 30px rgba(10,37,64,.08);
-    --sombra-hover:0 14px 40px rgba(10,37,64,.16);
+    --sombra-hover:0 16px 44px rgba(10,37,64,.18);
     --raio:16px;
+    --foco:0 0 0 3px rgba(23,105,170,.35);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -31,6 +32,7 @@
     line-height:1.55;
     -webkit-font-smoothing:antialiased;
   }
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:none;box-shadow:var(--foco);border-radius:8px}
 
   /* ===== TOPO ===== */
   header.topo{
@@ -63,33 +65,53 @@
   /* ===== HERO ===== */
   .hero{
     position:relative;overflow:hidden;
-    background:linear-gradient(125deg,var(--azul-900) 0%,var(--azul-700) 45%,var(--verde-700) 100%);
-    color:#fff;padding:64px 22px 72px;
+    background:linear-gradient(125deg,var(--azul-900) 0%,var(--azul-700) 48%,#0c5e46 100%);
+    color:#fff;padding:66px 22px 78px;
+  }
+  /* malha técnica / blueprint — conversa com o domínio (P&ID, engenharia) */
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
+    background-size:34px 34px;
+    -webkit-mask-image:radial-gradient(circle at 30% 30%,#000,transparent 78%);
+            mask-image:radial-gradient(circle at 30% 30%,#000,transparent 78%);
   }
   .hero::after{
-    content:"";position:absolute;right:-120px;top:-120px;
-    width:420px;height:420px;border-radius:50%;
-    background:radial-gradient(circle,rgba(52,211,153,.30),transparent 70%);
+    content:"";position:absolute;right:-130px;top:-130px;
+    width:440px;height:440px;border-radius:50%;
+    background:radial-gradient(circle,rgba(52,211,153,.28),transparent 70%);
   }
   .hero-inner{max-width:1180px;margin:0 auto;position:relative;z-index:1}
   .selo{
-    display:inline-block;background:rgba(255,255,255,.14);
+    display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);
     border:1px solid rgba(255,255,255,.25);
     padding:6px 14px;border-radius:999px;font-size:12.5px;font-weight:600;
-    letter-spacing:.4px;margin-bottom:18px;
+    letter-spacing:.4px;margin-bottom:20px;
   }
-  .hero h1{font-size:38px;line-height:1.12;font-weight:800;max-width:760px;letter-spacing:-.5px}
+  .selo i{width:7px;height:7px;border-radius:50%;background:var(--verde-300);box-shadow:0 0 0 3px rgba(52,211,153,.25)}
+  .hero h1{font-size:40px;line-height:1.1;font-weight:800;max-width:780px;letter-spacing:-.6px}
   .hero h1 .grad{
     background:linear-gradient(90deg,var(--verde-300),var(--azul-300));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .hero p.sub{margin-top:16px;font-size:17px;max-width:640px;color:#dfeaf3}
-  .hero .stats{display:flex;gap:34px;margin-top:30px;flex-wrap:wrap}
-  .hero .stats div b{display:block;font-size:26px;font-weight:800}
-  .hero .stats div span{font-size:12.5px;color:#cdddea;letter-spacing:.3px}
+  .hero p.sub{margin-top:16px;font-size:17px;max-width:660px;color:#dfeaf3}
+  .hero .stats{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .hero .stats div{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+    border-radius:14px;padding:14px 20px;min-width:128px;
+  }
+  .hero .stats div b{display:block;font-size:27px;font-weight:800;line-height:1.1}
+  .hero .stats div span{font-size:12px;color:#cdddea;letter-spacing:.3px}
+  /* progresso geral */
+  .hero-prog{max-width:520px;margin-top:26px}
+  .hero-prog .track{height:8px;border-radius:8px;background:rgba(255,255,255,.16);overflow:hidden}
+  .hero-prog .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--verde-300),var(--azul-300));width:0;transition:width .9s cubic-bezier(.4,0,.2,1)}
+  .hero-prog .leg{display:flex;justify-content:space-between;font-size:12px;color:#cdddea;margin-top:8px}
 
-  /* ===== BUSCA ===== */
-  .barra-busca{max-width:1180px;margin:-30px auto 0;padding:0 22px;position:relative;z-index:5}
+  /* ===== CONTROLES (busca + filtros) ===== */
+  .controles{max-width:1180px;margin:-32px auto 0;padding:0 22px;position:relative;z-index:5}
   .busca-box{
     background:#fff;border-radius:14px;box-shadow:var(--sombra);
     display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--linha);
@@ -99,19 +121,24 @@
     border:0;outline:0;width:100%;font-size:15.5px;color:var(--tinta);background:transparent;
   }
   .busca-box input::placeholder{color:#9aa9b6}
-
-  /* ===== LEGENDA ===== */
-  .legenda{max-width:1180px;margin:18px auto 0;padding:0 22px;display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--cinza)}
-  .legenda span{display:inline-flex;align-items:center;gap:7px}
-  .dot{width:10px;height:10px;border-radius:50%}
+  .filtros{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+    background:#fff;border:1px solid var(--linha);color:var(--cinza);
+    font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;transition:.16s;
+  }
+  .chip:hover{border-color:var(--azul-300);color:var(--azul-700)}
+  .chip.is-active{background:var(--azul-900);border-color:var(--azul-900);color:#fff}
+  .chip .dot{width:9px;height:9px;border-radius:50%}
+  .chip .ct{font-size:11.5px;opacity:.7;font-weight:700}
   .dot.ok{background:var(--verde-500)}
   .dot.wip{background:#f59e0b}
   .dot.soon{background:#c2cdd6}
 
   /* ===== PILARES ===== */
-  main{max-width:1180px;margin:0 auto;padding:36px 22px 60px}
-  .pilar{margin-top:46px;scroll-margin-top:90px}
-  .pilar-head{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+  main{max-width:1180px;margin:0 auto;padding:38px 22px 60px}
+  .pilar{margin-top:48px;scroll-margin-top:90px}
+  .pilar-head{display:flex;align-items:center;gap:16px;margin-bottom:4px;flex-wrap:wrap}
   .pilar-num{
     width:54px;height:54px;border-radius:14px;flex:none;
     display:flex;align-items:center;justify-content:center;
@@ -123,6 +150,16 @@
   .p4 .pilar-num{background:linear-gradient(135deg,#0f5132,#34d399)}
   .pilar-head h2{font-size:23px;color:var(--azul-900);letter-spacing:-.3px}
   .pilar-head p{font-size:13.5px;color:var(--cinza)}
+  .pilar-prog{
+    margin-left:auto;display:flex;align-items:center;gap:10px;
+    font-size:12.5px;font-weight:700;color:var(--azul-700);white-space:nowrap;
+  }
+  .pilar-prog .mini{width:96px;height:7px;border-radius:7px;background:#e7eef4;overflow:hidden}
+  .pilar-prog .mini i{display:block;height:100%;border-radius:7px}
+  .p1 .pilar-prog .mini i{background:linear-gradient(90deg,#0a2540,#1769aa)}
+  .p2 .pilar-prog .mini i{background:linear-gradient(90deg,#1769aa,#149b8e)}
+  .p3 .pilar-prog .mini i{background:linear-gradient(90deg,#0f7a4d,#16a34a)}
+  .p4 .pilar-prog .mini i{background:linear-gradient(90deg,#0f5132,#34d399)}
   .pilar-barra{height:4px;border-radius:4px;margin:14px 0 22px}
   .p1 .pilar-barra{background:linear-gradient(90deg,#0a2540,#1769aa)}
   .p2 .pilar-barra{background:linear-gradient(90deg,#1769aa,#149b8e)}
@@ -132,11 +169,16 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
   .card{
     background:#fff;border:1px solid var(--linha);border-radius:var(--raio);
-    padding:20px 20px 16px;box-shadow:var(--sombra);transition:.2s;
+    padding:20px 20px 16px;box-shadow:var(--sombra);transition:transform .2s,box-shadow .2s,border-color .2s;
     display:flex;flex-direction:column;
   }
-  .card:hover{transform:translateY(-3px);box-shadow:var(--sombra-hover)}
-  .card h3{font-size:16px;color:var(--azul-900);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--sombra-hover);border-color:#d3deea}
+  .card h3{font-size:16px;color:var(--azul-900);margin-bottom:4px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+  .card h3 .cont{
+    flex:none;font-size:11px;font-weight:700;color:var(--verde-700);
+    background:#e9f9f0;border-radius:999px;padding:3px 9px;
+  }
+  .card h3 .cont.zero{color:#9aa9b6;background:#eef2f6}
   .card .elem-desc{font-size:13px;color:var(--cinza);margin-bottom:14px}
   .ferramentas{display:flex;flex-direction:column;gap:7px;margin-top:auto}
   .ferr{
@@ -171,8 +213,14 @@
 
   @media(max-width:600px){
     .hero h1{font-size:29px}
-    .hero .stats{gap:22px}
+    .hero .stats{gap:10px}
+    .hero .stats div{min-width:0;flex:1 1 44%;padding:12px 14px}
+    .pilar-prog{margin-left:0;width:100%}
     nav.menu{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important}
+    .hero-prog .fill{transition:none}
   }
 </style>
 </head>
@@ -200,30 +248,34 @@
 <!-- HERO -->
 <section class="hero" id="topo">
   <div class="hero-inner">
-    <span class="selo">● Estrutura baseada no RBPS / CCPS</span>
+    <span class="selo"><i></i> Estrutura baseada no RBPS / CCPS</span>
     <h1>Portal de ferramentas de <span class="grad">Segurança de Processo</span></h1>
     <p class="sub">Um único lugar reunindo as ferramentas dos pilares do PSM — da análise de riscos à investigação de incidentes — organizadas pelo modelo Risk Based Process Safety.</p>
     <div class="stats">
+      <div><b id="st-ok">0</b><span>ferramentas disponíveis</span></div>
       <div><b id="st-total">0</b><span>ferramentas mapeadas</span></div>
       <div><b>4</b><span>pilares RBPS</span></div>
       <div><b id="st-elem">0</b><span>elementos de gestão</span></div>
     </div>
+    <div class="hero-prog">
+      <div class="track"><div class="fill" id="prog-geral"></div></div>
+      <div class="leg"><span>Progresso do portal</span><span id="prog-txt">0%</span></div>
+    </div>
   </div>
 </section>
 
-<!-- BUSCA -->
-<div class="barra-busca">
+<!-- CONTROLES -->
+<div class="controles">
   <div class="busca-box">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1769aa" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
     <input id="busca" type="text" placeholder="Buscar ferramenta… (ex: HAZOP, 5 Porquês, MOC, Bow Tie)">
   </div>
-</div>
-
-<!-- LEGENDA -->
-<div class="legenda">
-  <span><i class="dot ok"></i> Disponível</span>
-  <span><i class="dot wip"></i> Em construção (próximas)</span>
-  <span><i class="dot soon"></i> Planejada</span>
+  <div class="filtros" id="filtros">
+    <button class="chip is-active" data-f="all">Todas</button>
+    <button class="chip" data-f="ok"><i class="dot ok"></i>Disponíveis <span class="ct" id="ct-ok">0</span></button>
+    <button class="chip" data-f="wip"><i class="dot wip"></i>Em breve <span class="ct" id="ct-wip">0</span></button>
+    <button class="chip" data-f="soon"><i class="dot soon"></i>Planejadas <span class="ct" id="ct-soon">0</span></button>
+  </div>
 </div>
 
 <!-- CONTEÚDO -->
@@ -305,7 +357,7 @@ const PILARES = [
       {nome:"Procedimentos Operacionais", desc:"Padronização da operação segura.",
         ferr:[{n:"Biblioteca de procedimentos",s:"soon",l:""},{n:"Checklists operacionais",s:"ok",l:"ferramentas/checklist.html"}]},
       {nome:"Práticas de Trabalho Seguro / Permissão de Trabalho", desc:"Controle de atividades não rotineiras.",
-        ferr:[{n:"PT Trabalho a Quente",s:"soon",l:""},{n:"PT Espaço Confinado",s:"soon",l:""},{n:"PT Elétrica",s:"soon",l:""}]},
+        ferr:[{n:"PT Trabalho a Quente",s:"ok",l:"ferramentas/permissao-trabalho.html"},{n:"PT Espaço Confinado",s:"ok",l:"ferramentas/permissao-trabalho.html"},{n:"PT Elétrica",s:"ok",l:"ferramentas/permissao-trabalho.html"}]},
       {nome:"Integridade de Ativos", desc:"Confiabilidade dos equipamentos críticos.",
         ferr:[{n:"Plano de manutenção preventiva",s:"soon",l:""},{n:"Inspeção baseada em risco (RBI)",s:"soon",l:""}]},
       {nome:"Gestão de Contratadas", desc:"Controle dos riscos trazidos por terceiros.",
@@ -313,7 +365,7 @@ const PILARES = [
       {nome:"Treinamento e Garantia de Desempenho", desc:"Capacitação e reciclagem das equipes.",
         ferr:[{n:"Matriz de treinamento",s:"soon",l:""},{n:"Avaliação de competência",s:"soon",l:""}]},
       {nome:"Gestão de Mudanças (MOC)", desc:"Avaliar qualquer alteração antes de implementar.",
-        ferr:[{n:"Formulário de MOC",s:"soon",l:""},{n:"Análise de risco da mudança",s:"soon",l:""}]},
+        ferr:[{n:"Formulário de MOC",s:"ok",l:"ferramentas/moc.html"},{n:"Análise de risco da mudança",s:"ok",l:"ferramentas/moc.html"}]},
       {nome:"Prontidão Operacional", desc:"Garantir condições seguras antes da partida.",
         ferr:[{n:"Checklist de pré-partida",s:"soon",l:""}]},
       {nome:"Gestão de Emergências", desc:"Preparação e resposta a cenários críticos.",
@@ -343,57 +395,102 @@ const PILARES = [
 
 const TXT = {ok:"Disponível", wip:"Em breve", soon:"Planejada"};
 
+/* contadores globais por status (para hero + chips) */
+const contagem = {ok:0, wip:0, soon:0};
+
 function render(){
   const alvo = document.getElementById("conteudo");
   let totalFerr=0, totalElem=0;
   alvo.innerHTML = PILARES.map(p=>{
     totalElem += p.elementos.length;
+    let okPilar=0, totPilar=0;
     const cards = p.elementos.map(e=>{
+      let okElem=0;
       const ferr = e.ferr.map(f=>{
-        totalFerr++;
+        totalFerr++; totPilar++;
+        contagem[f.s] = (contagem[f.s]||0)+1;
+        if(f.s==="ok"){ okPilar++; okElem++; }
         const clicavel = f.s==="ok" && f.l;
-        const tag = clicavel ? `<a class="ferr" href="${f.l}">` : `<span class="ferr is-soon">`;
+        const tag = clicavel ? `<a class="ferr" data-status="${f.s}" href="${f.l}">` : `<span class="ferr is-soon" data-status="${f.s}">`;
         const fim = clicavel ? `</a>` : `</span>`;
         return `${tag}
             <i class="fdot ${f.s}"></i>${f.n}
             <span class="badge ${f.s}">${TXT[f.s]}</span>
           ${fim}`;
       }).join("");
+      const cont = `<span class="cont ${okElem?'':'zero'}">${okElem}/${e.ferr.length}</span>`;
       return `<div class="card" data-busca="${(e.nome+' '+e.ferr.map(f=>f.n).join(' ')).toLowerCase()}">
-          <h3>${e.nome}</h3>
+          <h3><span>${e.nome}</span>${cont}</h3>
           <div class="elem-desc">${e.desc}</div>
           <div class="ferramentas">${ferr}</div>
         </div>`;
     }).join("");
+    const pct = totPilar ? Math.round(okPilar/totPilar*100) : 0;
     return `<section class="pilar ${p.classe}" id="${p.id}">
         <div class="pilar-head">
           <div class="pilar-num">${p.num}</div>
           <div><h2>${p.titulo}</h2><p>${p.desc}</p></div>
+          <div class="pilar-prog"><span>${okPilar}/${totPilar} prontas</span><span class="mini"><i style="width:${pct}%"></i></span></div>
         </div>
         <div class="pilar-barra"></div>
         <div class="grid">${cards}</div>
       </section>`;
   }).join("");
+
   document.getElementById("st-total").textContent = totalFerr;
   document.getElementById("st-elem").textContent = totalElem;
+  document.getElementById("st-ok").textContent = contagem.ok;
+  document.getElementById("ct-ok").textContent = contagem.ok;
+  document.getElementById("ct-wip").textContent = contagem.wip;
+  document.getElementById("ct-soon").textContent = contagem.soon;
+
+  const pctGeral = totalFerr ? Math.round(contagem.ok/totalFerr*100) : 0;
+  document.getElementById("prog-txt").textContent = pctGeral + "%";
+  /* anima a barra após render */
+  requestAnimationFrame(()=>{ document.getElementById("prog-geral").style.width = pctGeral + "%"; });
 }
 render();
 
-/* Busca / filtro */
+/* ===== Busca + filtros combinados ===== */
 const busca = document.getElementById("busca");
-busca.addEventListener("input", ()=>{
+let statusAtivo = "all";
+
+function aplicarFiltros(){
   const termo = busca.value.trim().toLowerCase();
-  let achou=0;
+  let achou = 0;
+
   document.querySelectorAll(".card").forEach(c=>{
-    const ok = c.dataset.busca.includes(termo);
-    c.style.display = ok ? "" : "none";
-    if(ok) achou++;
+    const bateTexto = c.dataset.busca.includes(termo);
+    let visiveisNoCard = 0;
+
+    c.querySelectorAll(".ferr").forEach(f=>{
+      const bateStatus = statusAtivo === "all" || f.dataset.status === statusAtivo;
+      const mostra = bateTexto && bateStatus;
+      f.style.display = mostra ? "" : "none";
+      if(mostra) visiveisNoCard++;
+    });
+
+    const mostraCard = bateTexto && visiveisNoCard > 0;
+    c.style.display = mostraCard ? "" : "none";
+    if(mostraCard) achou++;
   });
+
   document.querySelectorAll(".pilar").forEach(p=>{
-    const visiveis = [...p.querySelectorAll(".card")].some(c=>c.style.display!=="none");
-    p.style.display = visiveis ? "" : "none";
+    const algum = [...p.querySelectorAll(".card")].some(c=>c.style.display!=="none");
+    p.style.display = algum ? "" : "none";
   });
+
   document.getElementById("vazio").style.display = achou ? "none" : "block";
+}
+
+busca.addEventListener("input", aplicarFiltros);
+
+document.getElementById("filtros").addEventListener("click", (ev)=>{
+  const btn = ev.target.closest(".chip");
+  if(!btn) return;
+  statusAtivo = btn.dataset.f;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("is-active", c===btn));
+  aplicarFiltros();
 });
 </script>
 </body>
