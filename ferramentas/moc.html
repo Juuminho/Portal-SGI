@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOC — Gestão de Mudanças | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1120px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1120px;margin:0 auto;padding:22px 20px 60px}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input,.campo textarea,.campo select{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe;resize:vertical}
+  .campo input:focus,.campo textarea:focus,.campo select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+  .check{display:flex;align-items:center;gap:9px;border:1px solid var(--linha);border-radius:10px;padding:9px 11px;background:#fafcfe;cursor:pointer;font-size:13.5px;font-weight:500}
+  .check:hover{border-color:var(--azul-300)}
+  .check input{width:18px;height:18px;accent-color:var(--azul-500);cursor:pointer}
+  /* stepper */
+  .stepper{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+  .step{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;color:var(--cinza);background:#f1f5f9;border:1px solid var(--linha)}
+  .step .step-n{width:22px;height:22px;border-radius:50%;background:#cbd5e1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+  .step.cur{color:#fff;background:linear-gradient(120deg,var(--azul-700),var(--azul-500));border-color:transparent}
+  .step.cur .step-n{background:rgba(255,255,255,.3)}
+  .step.done{color:var(--verde-700);background:#dcfce7;border-color:#86efac}
+  .step.done .step-n{background:var(--verde-500)}
+  .step-line{flex:1;min-width:8px;height:2px;background:var(--linha)}
+  /* tabelas */
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.t{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:30px}
+  table.t textarea,table.t input,table.t select{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 7px;font-family:inherit;font-size:13px;resize:vertical;background:transparent}
+  table.t textarea:focus,table.t input:focus,table.t select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.t select{cursor:pointer}
+  td.ps{text-align:center}
+  td.ps select{text-align:center;width:48px}
+  .nivel-badge{display:inline-block;min-width:72px;text-align:center;padding:5px 6px;border-radius:7px;font-weight:800;font-size:10.5px;color:#fff;line-height:1.15}
+  .nivel-badge small{display:block;font-weight:600;font-size:9px;opacity:.9}
+  select.st-status{font-weight:700}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  footer{max-width:1120px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}table.t{min-width:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">MOC — Gestão de Mudanças<span>Avaliar e controlar qualquer alteração antes de implementar</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="secao">🗂️ Identificação</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo"><label>Nº da MOC</label><input id="h-num" data-save></div>
+      <div class="campo"><label>Título da mudança</label><input id="h-titulo" data-save></div>
+      <div class="campo"><label>Solicitante</label><input id="h-solicitante" data-save></div>
+      <div class="campo"><label>Empresa / Setor / Área</label><input id="h-area" data-save></div>
+      <div class="campo"><label>Data da solicitação</label><input id="h-data" type="date" data-save></div>
+      <div class="campo"><label>Tipo de mudança</label><select id="h-tipo" data-save><option>Permanente</option><option>Temporária</option><option>Emergencial</option></select></div>
+      <div class="campo"><label>Prazo de retorno (se temporária)</label><input id="h-retorno" type="date" data-save></div>
+    </div>
+  </div>
+
+  <div class="secao">📌 Etapa atual</div>
+  <div class="card">
+    <div class="campo" style="max-width:260px;margin-bottom:14px"><label>Mudar etapa</label><select id="sel-etapa" data-save></select></div>
+    <div class="stepper" id="stepper"></div>
+  </div>
+
+  <div class="secao">📝 Descrição da mudança</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo"><label>Situação atual</label><textarea id="d-atual" rows="3" data-save></textarea></div>
+      <div class="campo"><label>Situação proposta</label><textarea id="d-proposta" rows="3" data-save></textarea></div>
+      <div class="campo" style="grid-column:1/-1"><label>Justificativa / motivo</label><textarea id="d-justif" rows="2" data-save></textarea></div>
+    </div>
+  </div>
+
+  <div class="secao">🏷️ O que a mudança envolve</div>
+  <div class="card"><div class="checks" id="categorias"></div></div>
+
+  <div class="secao">⚠️ Análise de risco da mudança</div>
+  <div class="card">
+    <div class="hint">Liste os riscos/impactos que a mudança pode introduzir e classifique (P × S, igual à Matriz de Risco). Toda mudança deve ter o risco avaliado antes de aprovar.</div>
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Risco / impacto introduzido</th><th>P</th><th>S</th><th>Nível</th><th>Medida de controle</th><th></th></tr></thead>
+      <tbody id="risco-body"></tbody>
+    </table></div>
+    <button class="btn add-row" id="add-risco">+ Adicionar risco</button>
+  </div>
+
+  <div class="secao">🛠️ Plano de implementação</div>
+  <div class="card">
+    <div class="hint">Requisitos que precisam ser cumpridos antes de fechar a mudança. Já deixei os mais comuns — edite, adicione ou remova conforme o caso.</div>
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Requisito / ação</th><th>Responsável</th><th>Prazo</th><th>Status</th><th></th></tr></thead>
+      <tbody id="acao-body"></tbody>
+    </table></div>
+    <button class="btn add-row" id="add-acao">+ Adicionar ação</button>
+  </div>
+
+  <div class="secao">✅ Aprovações multidisciplinares</div>
+  <div class="card">
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th>Área</th><th>Nome</th><th>Decisão</th><th>Data</th></tr></thead>
+      <tbody id="aprov-body"></tbody>
+    </table></div>
+  </div>
+
+  <div class="secao">🔚 Encerramento</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo" style="grid-column:1/-1"><label>Verificação pós-implementação</label><textarea id="e-verif" rows="2" data-save placeholder="A mudança foi implementada conforme planejado? Documentos e treinamentos atualizados?"></textarea></div>
+      <div class="campo"><label>Data do encerramento</label><input id="e-data" type="date" data-save></div>
+      <div class="campo"><label>Encerrada por</label><input id="e-por" data-save></div>
+    </div>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · MOC — Gestão de Mudanças<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const ETAPAS=["Solicitação","Avaliação técnica","Aprovação","Implementação","Treinamento","Encerramento"];
+const CATEGORIAS=["Equipamento","Processo","Procedimento","Matéria-prima","Software / sistema","Estrutura / civil","Instrumentação / controle","Organizacional"];
+const AREAS=["Operação","Manutenção","Engenharia","SSMA","Gestão"];
+const STATUS=["Não iniciado","Em andamento","Concluído","N.A."];
+const DECISOES=["Pendente","Aprovado","Reprovado"];
+const ACOES_PADRAO=["Atualizar P&ID / fluxogramas / desenhos","Atualizar procedimentos operacionais","Atualizar análise de riscos (APR/HAZOP)","Treinar a equipe envolvida","Atualizar plano de emergência","Comunicar às partes interessadas","Inspeção / teste / pré-partida"];
+function nivel(sc){if(sc<=4)return{n:"Baixo",h:"#16a34a"};if(sc<=9)return{n:"Moderado",h:"#eab308"};if(sc<=14)return{n:"Alto",h:"#f97316"};return{n:"Extremo",h:"#dc2626"};}
+function corTexto(sc){return sc>=5&&sc<=9?"#5c4a06":"#fff";}
+function opcoes(sel){return [1,2,3,4,5].map(n=>`<option ${n==sel?"selected":""}>${n}</option>`).join("");}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+function badge(p,s){const sc=p*s,nv=nivel(sc);return `<span class="nivel-badge" style="background:${nv.h};color:${corTexto(sc)}">${nv.n}<small>${sc}</small></span>`;}
+const STORE="sgi_moc";
+let DADOS={header:{},etapa:"Solicitação",desc:{},categorias:{},riscos:[],acoes:[],aprov:[],enc:{}};
+
+function buildEtapaSelect(){document.getElementById("sel-etapa").innerHTML=ETAPAS.map(e=>`<option>${e}</option>`).join("");}
+function renderStepper(){
+  const idx=ETAPAS.indexOf(DADOS.etapa);
+  document.getElementById("stepper").innerHTML=ETAPAS.map((e,i)=>{
+    const cls=i<idx?"done":i===idx?"cur":"";
+    return `<div class="step ${cls}"><span class="step-n">${i<idx?"✓":i+1}</span>${e}</div>`;
+  }).join('<div class="step-line"></div>');
+  document.getElementById("sel-etapa").value=DADOS.etapa;
+}
+function renderCategorias(){document.getElementById("categorias").innerHTML=CATEGORIAS.map((c,i)=>`<label class="check"><input type="checkbox" data-cat="${i}" ${DADOS.categorias[i]?"checked":""}> ${c}</label>`).join("");}
+function renderRiscos(){
+  document.getElementById("risco-body").innerHTML=DADOS.riscos.map((e,i)=>`
+    <tr><td class="nro">${i+1}</td>
+      <td><textarea data-tab="riscos" data-i="${i}" data-f="risco">${esc(e.risco)}</textarea></td>
+      <td class="ps"><select data-tab="riscos" data-i="${i}" data-f="p">${opcoes(e.p)}</select></td>
+      <td class="ps"><select data-tab="riscos" data-i="${i}" data-f="s">${opcoes(e.s)}</select></td>
+      <td class="ps">${badge(e.p,e.s)}</td>
+      <td><textarea data-tab="riscos" data-i="${i}" data-f="medida">${esc(e.medida)}</textarea></td>
+      <td class="col-del"><button data-del="riscos" data-i="${i}">✕</button></td></tr>`).join("");
+}
+function renderAcoes(){
+  document.getElementById("acao-body").innerHTML=DADOS.acoes.map((e,i)=>`
+    <tr><td class="nro">${i+1}</td>
+      <td><textarea data-tab="acoes" data-i="${i}" data-f="req">${esc(e.req)}</textarea></td>
+      <td><input data-tab="acoes" data-i="${i}" data-f="resp" value="${escAttr(e.resp)}"></td>
+      <td><input type="date" data-tab="acoes" data-i="${i}" data-f="prazo" value="${escAttr(e.prazo)}"></td>
+      <td><select class="st-status" data-tab="acoes" data-i="${i}" data-f="status">${STATUS.map(s=>`<option ${s===e.status?"selected":""}>${s}</option>`).join("")}</select></td>
+      <td class="col-del"><button data-del="acoes" data-i="${i}">✕</button></td></tr>`).join("");
+}
+function renderAprov(){
+  document.getElementById("aprov-body").innerHTML=DADOS.aprov.map((e,i)=>`
+    <tr><td style="font-weight:700;color:var(--azul-900)">${e.area}</td>
+      <td><input data-tab="aprov" data-i="${i}" data-f="nome" value="${escAttr(e.nome)}"></td>
+      <td><select data-tab="aprov" data-i="${i}" data-f="decisao">${DECISOES.map(d=>`<option ${d===e.decisao?"selected":""}>${d}</option>`).join("")}</select></td>
+      <td><input type="date" data-tab="aprov" data-i="${i}" data-f="data" value="${escAttr(e.data)}"></td></tr>`).join("");
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletarHeader(){
+  ["h-num","h-titulo","h-solicitante","h-area","h-data","h-tipo","h-retorno"].forEach(id=>DADOS.header[id]=val(id));
+  DADOS.etapa=val("sel-etapa");
+  DADOS.desc={atual:val("d-atual"),proposta:val("d-proposta"),justif:val("d-justif")};
+  DADOS.enc={verif:val("e-verif"),data:val("e-data"),por:val("e-por")};
+}
+function carregar(st){
+  if(!st)return;DADOS=st;
+  DADOS.header=DADOS.header||{};DADOS.categorias=DADOS.categorias||{};DADOS.riscos=DADOS.riscos||[];DADOS.acoes=DADOS.acoes||[];
+  const h=DADOS.header;["h-num","h-titulo","h-solicitante","h-area","h-data","h-tipo","h-retorno"].forEach(id=>setVal(id,h[id]));
+  const d=DADOS.desc||{};setVal("d-atual",d.atual);setVal("d-proposta",d.proposta);setVal("d-justif",d.justif);
+  const e=DADOS.enc||{};setVal("e-verif",e.verif);setVal("e-data",e.data);setVal("e-por",e.por);
+  if(!DADOS.riscos.length)DADOS.riscos=[{risco:"",p:1,s:1,medida:""}];
+  if(!DADOS.acoes.length)DADOS.acoes=ACOES_PADRAO.map(r=>({req:r,resp:"",prazo:"",status:"Não iniciado"}));
+  if(!DADOS.aprov||!DADOS.aprov.length)DADOS.aprov=AREAS.map(a=>({area:a,nome:"",decisao:"Pendente",data:""}));
+  if(!DADOS.etapa)DADOS.etapa="Solicitação";
+  renderCategorias();renderRiscos();renderAcoes();renderAprov();renderStepper();
+}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletarHeader();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.tab){const i=+t.dataset.i,f=t.dataset.f;const num=["p","s"].includes(f);DADOS[t.dataset.tab][i][f]=num?+t.value:t.value;if(num)renderRiscos();}
+  if(t.dataset.cat!=null)DADOS.categorias[t.dataset.cat]=t.checked;
+  if(t.id==="sel-etapa"){DADOS.etapa=t.value;renderStepper();}
+  autosave();
+});
+document.addEventListener("change",e=>{if(e.target.dataset.cat!=null){DADOS.categorias[e.target.dataset.cat]=e.target.checked;autosave();}});
+document.getElementById("add-risco").addEventListener("click",()=>{DADOS.riscos.push({risco:"",p:1,s:1,medida:""});renderRiscos();autosave();});
+document.getElementById("add-acao").addEventListener("click",()=>{DADOS.acoes.push({req:"",resp:"",prazo:"",status:"Não iniciado"});renderAcoes();autosave();});
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.del){const tab=t.dataset.del;DADOS[tab].splice(+t.dataset.i,1);if(tab==="riscos"){if(!DADOS.riscos.length)DADOS.riscos=[{risco:"",p:1,s:1,medida:""}];renderRiscos();}else{if(!DADOS.acoes.length)DADOS.acoes=[{req:"",resp:"",prazo:"",status:"Não iniciado"}];renderAcoes();}autosave();}
+});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletarHeader();const nome=(DADOS.header["h-num"]||DADOS.header["h-titulo"]||"moc").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="moc_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA esta MOC. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+
+buildEtapaSelect();
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){carregar(null);}}
+if(!DADOS.acoes||!DADOS.acoes.length){ // primeira vez
+  DADOS.riscos=[{risco:"",p:1,s:1,medida:""}];
+  DADOS.acoes=ACOES_PADRAO.map(r=>({req:r,resp:"",prazo:"",status:"Não iniciado"}));
+  DADOS.aprov=AREAS.map(a=>({area:a,nome:"",decisao:"Pendente",data:""}));
+  renderCategorias();renderRiscos();renderAcoes();renderAprov();renderStepper();
+}
+</script>
+</body>
+</html>

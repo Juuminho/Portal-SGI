@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permissão de Trabalho (PT) | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input,.campo textarea{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe;resize:vertical}
+  .campo input:focus,.campo textarea:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  /* checkboxes em grade */
+  .checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}
+  .check{display:flex;align-items:center;gap:9px;border:1px solid var(--linha);border-radius:10px;padding:9px 11px;background:#fafcfe;cursor:pointer;font-size:13.5px;font-weight:500}
+  .check:hover{border-color:var(--azul-300)}
+  .check input{width:18px;height:18px;accent-color:var(--azul-500);cursor:pointer}
+  /* checklists Sim/Não/N.A. */
+  table.chk{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.chk td{border-bottom:1px solid var(--linha);padding:7px 6px;vertical-align:middle}
+  table.chk .chk-item{width:auto}
+  table.chk .chk-sel{width:150px;text-align:right}
+  table.chk select{border:1px solid var(--linha);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:#fff;min-width:120px}
+  select.s-ok{color:#16a34a}select.s-nc{color:#dc2626}select.s-na{color:#5b6b7a}
+  /* bloco específico */
+  .bloco{border:1px solid var(--linha);border-radius:12px;margin-top:14px;overflow:hidden;display:none}
+  .bloco.on{display:block}
+  .bloco-h{padding:10px 14px;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(120deg,var(--azul-700),var(--azul-500))}
+  .bloco-h.quente{background:linear-gradient(120deg,#9a3412,#ea580c)}
+  .bloco-h.confinado{background:linear-gradient(120deg,#7a5c0f,#b8950a)}
+  .bloco-h.eletrica{background:linear-gradient(120deg,#0f3a63,#1769aa)}
+  .bloco-h.altura{background:linear-gradient(120deg,#0f5132,#16a34a)}
+  .bloco-body{padding:8px 14px 12px}
+  .gases{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px;padding-top:12px;border-top:1px dashed var(--linha)}
+  .gases .campo input{text-align:center;font-weight:700}
+  footer{max-width:1080px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.voltar{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}.bloco{display:none}.bloco.on{display:block}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Permissão de Trabalho (PT)<span>Trabalho a quente · Espaço confinado · Elétrica · Altura</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="secao">🗂️ Identificação</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo"><label>Nº da PT</label><input id="h-num" data-save></div>
+      <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+      <div class="campo"><label>Local da atividade</label><input id="h-local" data-save></div>
+      <div class="campo"><label>Empresa executante</label><input id="h-executante" data-save></div>
+      <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+      <div class="campo"><label>Validade — início</label><input id="h-inicio" type="time" data-save></div>
+      <div class="campo"><label>Validade — término</label><input id="h-fim" type="time" data-save></div>
+      <div class="campo" style="grid-column:1/-1"><label>Descrição do serviço</label><textarea id="h-descricao" rows="2" data-save></textarea></div>
+      <div class="campo" style="grid-column:1/-1"><label>Executantes (nomes)</label><textarea id="h-nomes" rows="2" data-save></textarea></div>
+    </div>
+  </div>
+
+  <div class="secao">🏷️ Tipo de trabalho</div>
+  <div class="card">
+    <div class="hint">Marque os tipos de trabalho. Ao marcar, os <b>checklists específicos</b> aparecem mais abaixo.</div>
+    <div class="checks" id="tipos"></div>
+  </div>
+
+  <div class="secao">✅ Verificações gerais (antes de iniciar)</div>
+  <div class="card"><div id="verif"></div></div>
+
+  <!-- blocos específicos -->
+  <div class="bloco" id="bloco-quente">
+    <div class="bloco-h quente">🔥 Trabalho a Quente</div>
+    <div class="bloco-body"><div id="chk-quente"></div></div>
+  </div>
+  <div class="bloco" id="bloco-confinado">
+    <div class="bloco-h confinado">🕳️ Espaço Confinado</div>
+    <div class="bloco-body">
+      <div id="chk-confinado"></div>
+      <div class="gases">
+        <div class="campo"><label>O₂ (%)</label><input id="g-o2" data-save placeholder="19,5 – 23,0"></div>
+        <div class="campo"><label>LEL (%)</label><input id="g-lel" data-save placeholder="&lt; 10%"></div>
+        <div class="campo"><label>H₂S (ppm)</label><input id="g-h2s" data-save></div>
+        <div class="campo"><label>CO (ppm)</label><input id="g-co" data-save></div>
+        <div class="campo"><label>Hora da medição</label><input id="g-hora" type="time" data-save></div>
+      </div>
+    </div>
+  </div>
+  <div class="bloco" id="bloco-eletrica">
+    <div class="bloco-h eletrica">⚡ Elétrica / Bloqueio (LOTO)</div>
+    <div class="bloco-body"><div id="chk-eletrica"></div></div>
+  </div>
+  <div class="bloco" id="bloco-altura">
+    <div class="bloco-h altura">🪜 Trabalho em Altura</div>
+    <div class="bloco-body"><div id="chk-altura"></div></div>
+  </div>
+
+  <div class="secao">🦺 EPIs obrigatórios</div>
+  <div class="card"><div class="checks" id="epis"></div></div>
+
+  <div class="secao">⚠️ Riscos adicionais e medidas de controle</div>
+  <div class="card"><div class="campo"><textarea id="h-riscos" rows="3" data-save placeholder="Riscos não cobertos acima e as medidas de controle adotadas…"></textarea></div></div>
+
+  <div class="secao">✍️ Liberação e assinaturas</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo"><label>Emitente (nome / função)</label><input id="a-emitente" data-save></div>
+      <div class="campo"><label>Executante responsável</label><input id="a-executante" data-save></div>
+      <div class="campo"><label>Aprovador / Responsável da área</label><input id="a-aprovador" data-save></div>
+    </div>
+  </div>
+
+  <div class="secao">🔚 Encerramento</div>
+  <div class="card">
+    <div class="grid">
+      <div class="campo" style="grid-column:1/-1"><label>Condições em que a área foi deixada</label><textarea id="e-cond" rows="2" data-save></textarea></div>
+      <div class="campo"><label>Data/hora do encerramento</label><input id="e-quando" data-save></div>
+      <div class="campo"><label>Encerrada por</label><input id="e-por" data-save></div>
+    </div>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Permissão de Trabalho<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const TIPOS=[
+  {k:"quente",n:"Trabalho a quente",bloco:"bloco-quente"},
+  {k:"confinado",n:"Espaço confinado",bloco:"bloco-confinado"},
+  {k:"eletrica",n:"Elétrica / LOTO",bloco:"bloco-eletrica"},
+  {k:"altura",n:"Trabalho em altura",bloco:"bloco-altura"},
+  {k:"icamento",n:"Içamento / carga"},
+  {k:"escavacao",n:"Escavação"},
+  {k:"quimicos",n:"Produtos químicos"},
+  {k:"outro",n:"Outro"}
+];
+const EPIS=["Capacete","Óculos de segurança","Protetor auricular","Luvas","Botina de segurança","Máscara / respirador","Cinto paraquedista","Protetor facial","Vestimenta específica","Sinalização / isolamento"];
+const CHK={
+  verif:["APR / AST elaborada e discutida com a equipe","Área isolada e sinalizada","Equipe treinada e apta para a atividade","Ferramentas e equipamentos inspecionados","Comunicação com a operação/área realizada","Condições climáticas adequadas","Rota de fuga e ponto de encontro definidos"],
+  quente:["Combustíveis/inflamáveis removidos ou protegidos","Extintor de incêndio disponível no local","Vigia de fogo designado","Medição de gases inflamáveis realizada (se aplicável)","Proteção contra fagulhas (mantas/anteparos)","Cilindros fixados, em pé e com válvula antirretorno"],
+  confinado:["Permissão de entrada específica emitida","Atmosfera monitorada continuamente","Vigia (supervisor de entrada) posicionado","Ventilação / exaustão adequada","Plano e equipamento de resgate disponíveis","Bloqueio de energias e fluidos (LOTO) realizado"],
+  eletrica:["Desenergização confirmada (teste de ausência de tensão)","Bloqueio e etiquetagem (LOTO) aplicados","Aterramento temporário instalado (se aplicável)","EPIs elétricos adequados à classe de tensão","Distâncias de segurança respeitadas"],
+  altura:["Sistema de ancoragem definido e inspecionado","Cinto paraquedista + talabarte duplo","Análise de risco de queda realizada","Projeção abaixo isolada","Trabalhador apto (ASO / NR-35)"]
+};
+function classeSit(v){return v==="Sim"?"s-ok":v==="Não"?"s-nc":v==="N.A."?"s-na":"";}
+function checklistHTML(grupo){
+  return `<table class="chk"><tbody>`+CHK[grupo].map((it,i)=>`
+    <tr><td class="chk-item">${it}</td>
+    <td class="chk-sel"><select data-chk="${grupo}" data-i="${i}"><option>—</option><option>Sim</option><option>Não</option><option>N.A.</option></select></td></tr>`).join("")+`</tbody></table>`;
+}
+const STORE="sgi_pt";
+let DADOS={};
+function buildUI(){
+  document.getElementById("tipos").innerHTML=TIPOS.map(t=>`<label class="check"><input type="checkbox" data-tipo="${t.k}" ${t.bloco?`data-bloco="${t.bloco}"`:""}> ${t.n}</label>`).join("");
+  document.getElementById("epis").innerHTML=EPIS.map((e,i)=>`<label class="check"><input type="checkbox" data-epi="${i}"> ${e}</label>`).join("");
+  ["verif","quente","confinado","eletrica","altura"].forEach(g=>document.getElementById(g==="verif"?"verif":"chk-"+g).innerHTML=checklistHTML(g));
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){
+  DADOS={
+    header:{},tipos:{},chk:{},gases:{},epis:{},
+    riscos:val("h-riscos"),
+    ass:{emitente:val("a-emitente"),executante:val("a-executante"),aprovador:val("a-aprovador")},
+    enc:{cond:val("e-cond"),quando:val("e-quando"),por:val("e-por")}
+  };
+  ["h-num","h-empresa","h-local","h-executante","h-data","h-inicio","h-fim","h-descricao","h-nomes"].forEach(id=>DADOS.header[id]=val(id));
+  document.querySelectorAll("[data-tipo]").forEach(c=>DADOS.tipos[c.dataset.tipo]=c.checked);
+  ["verif","quente","confinado","eletrica","altura"].forEach(g=>DADOS.chk[g]=[...document.querySelectorAll(`select[data-chk="${g}"]`)].map(s=>s.value));
+  ["g-o2","g-lel","g-h2s","g-co","g-hora"].forEach(id=>DADOS.gases[id]=val(id));
+  document.querySelectorAll("[data-epi]").forEach(c=>DADOS.epis[c.dataset.epi]=c.checked);
+}
+function carregar(st){
+  if(!st)return;DADOS=st;
+  const h=st.header||{};Object.keys(h).forEach(id=>setVal(id,h[id]));
+  setVal("h-riscos",st.riscos);
+  const a=st.ass||{};setVal("a-emitente",a.emitente);setVal("a-executante",a.executante);setVal("a-aprovador",a.aprovador);
+  const e=st.enc||{};setVal("e-cond",e.cond);setVal("e-quando",e.quando);setVal("e-por",e.por);
+  const g=st.gases||{};["g-o2","g-lel","g-h2s","g-co","g-hora"].forEach(id=>setVal(id,g[id]));
+  const tp=st.tipos||{};document.querySelectorAll("[data-tipo]").forEach(c=>{c.checked=!!tp[c.dataset.tipo];if(c.dataset.bloco){document.getElementById(c.dataset.bloco).classList.toggle("on",c.checked);}});
+  const ep=st.epis||{};document.querySelectorAll("[data-epi]").forEach(c=>c.checked=!!ep[c.dataset.epi]);
+  const ck=st.chk||{};["verif","quente","confinado","eletrica","altura"].forEach(grp=>{const sels=document.querySelectorAll(`select[data-chk="${grp}"]`);(ck[grp]||[]).forEach((v,i)=>{if(sels[i]){sels[i].value=v;sels[i].className=classeSit(v);}});});
+}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+document.addEventListener("change",e=>{
+  if(e.target.dataset.bloco){document.getElementById(e.target.dataset.bloco).classList.toggle("on",e.target.checked);}
+  if(e.target.dataset.chk){e.target.className=classeSit(e.target.value);}
+  autosave();
+});
+document.addEventListener("input",e=>{autosave();});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header["h-num"]||DADOS.header["h-empresa"]||"pt").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="pt_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA esta PT. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+buildUI();
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){}}
+</script>
+</body>
+</html>

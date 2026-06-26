@@ -1,13 +1,13 @@
 /* ============================================================
-   BOWTIE SGI — design system (Tecnored)
+   BOWTIE SGI — design system (cores verde/azul do Portal SGI)
    ============================================================ */
 :root {
-  --teal-900: #003c3d;
-  --teal: #006667;            /* primária Tecnored */
-  --teal-600: #1b7a7a;
-  --teal-medio: #4A938F;
-  --verde-claro: #8CB292;
-  --verde-ok: #00814B;        /* exclusivo sucesso/aprovação */
+  --teal-900: #0a2540;        /* azul escuro SGI (início do gradiente) */
+  --teal: #1769aa;            /* primária — azul SGI */
+  --teal-600: #16a34a;        /* verde SGI (fim do gradiente) */
+  --teal-medio: #4aa3df;
+  --verde-claro: #34d399;
+  --verde-ok: #16a34a;        /* sucesso/aprovação */
   --roxo: #65236E;
   --ink: #102222;
   --muted: #5b6f6f;
@@ -19,15 +19,15 @@
   --warn-bg: #fdf6dd;
   --azul: #2456a6;            /* ameaça (convenção da norma) */
   --radius: 12px;
-  --shadow-sm: 0 1px 2px rgba(8, 40, 40, .08);
-  --shadow: 0 4px 16px rgba(8, 40, 40, .12);
-  --shadow-lg: 0 16px 40px rgba(8, 40, 40, .20);
+  --shadow-sm: 0 1px 2px rgba(10, 37, 64, .08);
+  --shadow: 0 4px 16px rgba(10, 37, 64, .12);
+  --shadow-lg: 0 16px 40px rgba(10, 37, 64, .20);
   --fonte: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-::selection { background: rgba(0, 102, 103, .18); }
+::selection { background: rgba(23, 105, 170, .18); }
 
 body {
   font-family: var(--fonte);
@@ -365,7 +365,7 @@ body.page-inv { overflow: auto; height: auto; min-height: 100vh; }
   border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; background: #fff;
   resize: vertical;
 }
-.drawer-body textarea:focus, .drawer-body select:focus { outline: none; border-color: var(--teal-medio); box-shadow: 0 0 0 3px rgba(74,147,143,.15); }
+.drawer-body textarea:focus, .drawer-body select:focus { outline: none; border-color: var(--teal-medio); box-shadow: 0 0 0 3px rgba(23,105,170,.15); }
 .switch-row { flex-direction: row !important; align-items: center; justify-content: space-between; }
 .switch-row input { appearance: none; width: 40px; height: 22px; border-radius: 999px; background: #d4dede; position: relative; cursor: pointer; transition: .2s; flex-shrink: 0; }
 .switch-row input::after { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: .2s; box-shadow: var(--shadow-sm); }
@@ -444,7 +444,7 @@ body.page-inv { overflow: auto; height: auto; min-height: 100vh; }
   border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; flex: 1; min-width: 240px;
   transition: .15s;
 }
-.busca:focus-within { border-color: var(--teal-medio); box-shadow: 0 0 0 3px rgba(74,147,143,.12); }
+.busca:focus-within { border-color: var(--teal-medio); box-shadow: 0 0 0 3px rgba(23,105,170,.12); }
 .busca svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
 .busca input { border: none; background: transparent; font-family: var(--fonte); font-size: 13.5px; padding: 10px 0; flex: 1; }
 .busca input:focus { outline: none; }
