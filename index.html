@@ -24,10 +24,10 @@
     --foco:0 0 0 3px rgba(23,105,170,.35);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;background:var(--fundo)}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--fundo);
+    background:transparent;
     color:var(--tinta);
     line-height:1.55;
     -webkit-font-smoothing:antialiased;
@@ -203,6 +203,26 @@
 
   .vazio{display:none;text-align:center;color:var(--cinza);padding:50px 0;font-size:15px}
 
+  /* ===== ANIMAÇÃO DE ENTRADA AO ROLAR ===== */
+  .js-reveal .reveal{
+    opacity:0;transform:translateY(26px);
+    transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1);
+    will-change:opacity,transform;
+  }
+  .js-reveal .reveal.in{opacity:1;transform:none}
+
+  /* ===== FUNDO ILUSTRADO QUE TROCA AO ROLAR ===== */
+  #bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  #bgfx .scene{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease}
+  #bgfx .scene.on{opacity:.12}
+  #bgfx .scene svg{width:100%;height:100%;display:block}
+  #bgfx .scene g{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  #bgfx .s1 g{stroke:#0a2540}
+  #bgfx .s2 g{stroke:#1769aa}
+  #bgfx .s3 g{stroke:#0f7a4d}
+  #bgfx .s4 g{stroke:#0f5132}
+  @media(prefers-reduced-motion:reduce){#bgfx .scene{transition:none}}
+
   /* ===== RODAPÉ ===== */
   footer{
     background:var(--azul-900);color:#cdddea;padding:34px 22px;margin-top:30px;
@@ -225,6 +245,70 @@
 </style>
 </head>
 <body>
+
+<!-- FUNDO ILUSTRADO (troca conforme rola) -->
+<div id="bgfx" aria-hidden="true">
+  <div class="scene s1 on">
+    <svg viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(330,400) scale(1.7)">
+        <path d="M0,-70 L60,-45 V5 C60,45 32,72 0,86 C-32,72 -60,45 -60,5 V-45 Z"/>
+        <polyline points="-26,4 -8,24 30,-22"/>
+      </g>
+      <g transform="translate(885,330) scale(1.5)">
+        <rect x="-45" y="-60" width="90" height="120" rx="8"/>
+        <path d="M-25,-30 H25 M-25,-5 H25 M-25,20 H8"/>
+      </g>
+    </svg>
+  </div>
+  <div class="scene s2">
+    <svg viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(340,400) scale(1.6)">
+        <circle cx="0" cy="0" r="72"/>
+        <line x1="0" y1="0" x2="40" y2="-34"/>
+        <circle cx="0" cy="0" r="6"/>
+        <line x1="0" y1="-72" x2="0" y2="-58"/>
+        <line x1="-62" y1="-36" x2="-50" y2="-29"/>
+        <line x1="62" y1="-36" x2="50" y2="-29"/>
+      </g>
+      <g transform="translate(880,375) scale(1.5)">
+        <path d="M0,-74 L74,58 L-74,58 Z"/>
+        <line x1="0" y1="-28" x2="0" y2="20"/>
+        <circle cx="0" cy="38" r="4"/>
+      </g>
+    </svg>
+  </div>
+  <div class="scene s3">
+    <svg viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(340,400) scale(1.5)">
+        <path d="M-56,-32 L0,0 L-56,32 Z"/>
+        <path d="M56,-32 L0,0 L56,32 Z"/>
+        <line x1="0" y1="0" x2="0" y2="-48"/>
+        <line x1="-20" y1="-48" x2="20" y2="-48"/>
+        <line x1="-92" y1="0" x2="-56" y2="0"/>
+        <line x1="56" y1="0" x2="92" y2="0"/>
+      </g>
+      <g transform="translate(885,365) scale(1.5)">
+        <rect x="-40" y="-6" width="80" height="66" rx="10"/>
+        <path d="M-24,-6 v-20 a24,24 0 0 1 48,0 v20"/>
+        <circle cx="0" cy="22" r="6"/>
+        <line x1="0" y1="22" x2="0" y2="40"/>
+      </g>
+    </svg>
+  </div>
+  <div class="scene s4">
+    <svg viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(330,400) scale(1.5)">
+        <line x1="-80" y1="-62" x2="-80" y2="62"/>
+        <line x1="-80" y1="62" x2="92" y2="62"/>
+        <polyline points="-80,40 -36,-8 6,20 50,-34 92,-52"/>
+      </g>
+      <g transform="translate(885,360) scale(1.5)">
+        <circle cx="0" cy="0" r="46"/>
+        <line x1="33" y1="33" x2="76" y2="76"/>
+      </g>
+    </svg>
+  </div>
+</div>
 
 <!-- TOPO -->
 <header class="topo">
@@ -404,7 +488,7 @@ function render(){
   alvo.innerHTML = PILARES.map(p=>{
     totalElem += p.elementos.length;
     let okPilar=0, totPilar=0;
-    const cards = p.elementos.map(e=>{
+    const cards = p.elementos.map((e,ei)=>{
       let okElem=0;
       const ferr = e.ferr.map(f=>{
         totalFerr++; totPilar++;
@@ -419,7 +503,7 @@ function render(){
           ${fim}`;
       }).join("");
       const cont = `<span class="cont ${okElem?'':'zero'}">${okElem}/${e.ferr.length}</span>`;
-      return `<div class="card" data-busca="${(e.nome+' '+e.ferr.map(f=>f.n).join(' ')).toLowerCase()}">
+      return `<div class="card reveal" style="transition-delay:${Math.min(ei,6)*60}ms" data-busca="${(e.nome+' '+e.ferr.map(f=>f.n).join(' ')).toLowerCase()}">
           <h3><span>${e.nome}</span>${cont}</h3>
           <div class="elem-desc">${e.desc}</div>
           <div class="ferramentas">${ferr}</div>
@@ -427,7 +511,7 @@ function render(){
     }).join("");
     const pct = totPilar ? Math.round(okPilar/totPilar*100) : 0;
     return `<section class="pilar ${p.classe}" id="${p.id}">
-        <div class="pilar-head">
+        <div class="pilar-head reveal">
           <div class="pilar-num">${p.num}</div>
           <div><h2>${p.titulo}</h2><p>${p.desc}</p></div>
           <div class="pilar-prog"><span>${okPilar}/${totPilar} prontas</span><span class="mini"><i style="width:${pct}%"></i></span></div>
@@ -450,6 +534,42 @@ function render(){
   requestAnimationFrame(()=>{ document.getElementById("prog-geral").style.width = pctGeral + "%"; });
 }
 render();
+
+/* ===== Animação de entrada ao rolar (sem bibliotecas) ===== */
+(function(){
+  const reduz = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // se o usuário prefere menos animação ou o navegador for antigo, mantém tudo visível
+  if(reduz || !('IntersectionObserver' in window)) return;
+  document.documentElement.classList.add('js-reveal');
+  const io = new IntersectionObserver((ents)=>{
+    ents.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, {threshold:0.08, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+
+/* ===== Fundo ilustrado que troca conforme o pilar no meio da tela ===== */
+(function(){
+  const scenes = [...document.querySelectorAll('#bgfx .scene')];
+  if(!scenes.length) return;
+  const pilarEls = ['pilar1','pilar2','pilar3','pilar4'].map(id=>document.getElementById(id)).filter(Boolean);
+  let atual = -1;
+  function atualizar(){
+    const linha = window.innerHeight * 0.4;   // linha de referência a 40% da tela
+    let melhor = 0;
+    for(let i=0;i<pilarEls.length;i++){
+      if(pilarEls[i].getBoundingClientRect().top <= linha) melhor = i;
+    }
+    if(melhor !== atual){ atual = melhor; scenes.forEach((s,k)=>s.classList.toggle('on', k===melhor)); }
+  }
+  // o IntersectionObserver dispara o recálculo durante a rolagem (não depende de rAF)
+  if('IntersectionObserver' in window){
+    const io2 = new IntersectionObserver(atualizar, {threshold:[0,0.2,0.4,0.6,0.8,1]});
+    pilarEls.forEach(el=>io2.observe(el));
+  }
+  window.addEventListener('scroll', atualizar, {passive:true});
+  window.addEventListener('resize', atualizar);
+  atualizar();
+})();
 
 /* ===== Busca + filtros combinados ===== */
 const busca = document.getElementById("busca");
