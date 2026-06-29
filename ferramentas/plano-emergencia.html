@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plano de Emergência | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.t{border-collapse:collapse;width:100%;font-size:13px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:30px}
+  table.t textarea,table.t input,table.t select{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 7px;font-family:inherit;font-size:13px;resize:vertical;background:transparent}
+  table.t textarea:focus,table.t input:focus,table.t select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.t select{cursor:pointer}
+  td.ps{text-align:center}
+  td.ps select.ps-sel{text-align:center;width:48px}
+  .nivel-badge{display:inline-block;min-width:72px;text-align:center;padding:5px 6px;border-radius:7px;font-weight:800;font-size:10.5px;color:#fff;line-height:1.15}
+  .nivel-badge small{display:block;font-weight:600;font-size:9px;opacity:.9}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  footer{max-width:1180px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Plano de Emergência<span>Cenários, brigada, recursos e simulados</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="secao">🗂️ Identificação</div>
+  <div class="card"><div class="grid">
+    <div class="campo"><label>Empresa / Planta</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Local / Área</label><input id="h-local" data-save></div>
+    <div class="campo"><label>Coordenador de emergência</label><input id="h-coord" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+    <div class="campo"><label>Revisão nº</label><input id="h-rev" data-save></div>
+  </div></div>
+
+  <div class="secao">📞 Contatos de emergência</div>
+  <div class="card">
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Órgão / Contato</th><th>Telefone</th><th></th></tr></thead>
+      <tbody id="tb-contatos"></tbody>
+    </table></div>
+    <button class="btn add-row" data-add="contatos">+ Adicionar contato</button>
+  </div>
+
+  <div class="secao">👥 Brigada de emergência</div>
+  <div class="card">
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Nome</th><th>Área / Função</th><th>Contato</th><th>Treinado?</th><th></th></tr></thead>
+      <tbody id="tb-brigada"></tbody>
+    </table></div>
+    <button class="btn add-row" data-add="brigada">+ Adicionar brigadista</button>
+  </div>
+
+  <div class="secao">🔥 Matriz de cenários</div>
+  <div class="card">
+    <div class="hint">Liste os cenários de emergência possíveis, classifique o risco (P × S) e defina a resposta. Já deixei os cenários mais comuns.</div>
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Cenário</th><th>P</th><th>S</th><th>Nível</th><th>Ações de resposta</th><th>Responsável</th><th></th></tr></thead>
+      <tbody id="tb-cenarios"></tbody>
+    </table></div>
+    <button class="btn add-row" data-add="cenarios">+ Adicionar cenário</button>
+  </div>
+
+  <div class="secao">🧯 Recursos e equipamentos</div>
+  <div class="card">
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Recurso / Equipamento</th><th>Local</th><th>Qtd.</th><th>Última inspeção</th><th></th></tr></thead>
+      <tbody id="tb-recursos"></tbody>
+    </table></div>
+    <button class="btn add-row" data-add="recursos">+ Adicionar recurso</button>
+  </div>
+
+  <div class="secao">🎯 Controle de simulados</div>
+  <div class="card">
+    <div class="hint">Registre os simulados realizados, o tempo de resposta e os pontos de melhoria identificados.</div>
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Data</th><th>Cenário simulado</th><th>Participantes</th><th>Tempo de resposta</th><th>Pontos de melhoria</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tb-simulados"></tbody>
+    </table></div>
+    <button class="btn add-row" data-add="simulados">+ Adicionar simulado</button>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Plano de Emergência<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+function nivel(sc){if(sc<=4)return{n:"Baixo",h:"#16a34a"};if(sc<=9)return{n:"Moderado",h:"#eab308"};if(sc<=14)return{n:"Alto",h:"#f97316"};return{n:"Extremo",h:"#dc2626"};}
+function corTexto(sc){return sc>=5&&sc<=9?"#5c4a06":"#fff";}
+function opcoes(sel){return [1,2,3,4,5].map(n=>`<option ${n==sel?"selected":""}>${n}</option>`).join("");}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+function badge(p,s){const sc=(p||1)*(s||1),nv=nivel(sc);return `<span class="nivel-badge" style="background:${nv.h};color:${corTexto(sc)}">${nv.n}<small>${sc}</small></span>`;}
+
+const STATUS_SIM=["Realizado","Agendado","Pendente"];
+const TABS={
+  contatos:{cols:[{f:"orgao"},{f:"tel"}]},
+  brigada:{cols:[{f:"nome"},{f:"area"},{f:"contato"},{f:"treinado",type:"select",opts:["Sim","Não"]}]},
+  cenarios:{cols:[{f:"cenario",type:"textarea"},{f:"p",type:"ps"},{f:"s",type:"ps"},{f:"nivel",type:"nivel"},{f:"resposta",type:"textarea"},{f:"resp"}]},
+  recursos:{cols:[{f:"recurso"},{f:"local"},{f:"qtd"},{f:"inspecao",type:"date"}]},
+  simulados:{cols:[{f:"data",type:"date"},{f:"cenario"},{f:"participantes"},{f:"tempo"},{f:"melhorias",type:"textarea"},{f:"status",type:"select",opts:STATUS_SIM}]}
+};
+const STORE="sgi_emergencia";
+let DADOS={header:{},contatos:[],brigada:[],cenarios:[],recursos:[],simulados:[]};
+
+function cellHTML(tab,i,col,row){
+  const v=row[col.f]!=null?row[col.f]:"";
+  if(col.type==="nivel") return badge(row.p,row.s);
+  if(col.type==="ps") return `<select class="ps-sel" data-tab="${tab}" data-i="${i}" data-f="${col.f}">${opcoes(v||1)}</select>`;
+  if(col.type==="select") return `<select data-tab="${tab}" data-i="${i}" data-f="${col.f}">${col.opts.map(o=>`<option ${o===v?"selected":""}>${o}</option>`).join("")}</select>`;
+  if(col.type==="date") return `<input type="date" data-tab="${tab}" data-i="${i}" data-f="${col.f}" value="${escAttr(v)}">`;
+  if(col.type==="textarea") return `<textarea data-tab="${tab}" data-i="${i}" data-f="${col.f}">${esc(v)}</textarea>`;
+  return `<input data-tab="${tab}" data-i="${i}" data-f="${col.f}" value="${escAttr(v)}">`;
+}
+function renderTab(tab){
+  const tb=document.getElementById("tb-"+tab);
+  tb.innerHTML=DADOS[tab].map((row,i)=>`<tr><td class="nro">${i+1}</td>`+
+    TABS[tab].cols.map(c=>`<td class="${(c.type==="ps"||c.type==="nivel")?"ps":""}">${cellHTML(tab,i,c,row)}</td>`).join("")+
+    `<td class="col-del"><button data-del="${tab}" data-i="${i}">✕</button></td></tr>`).join("");
+}
+function renderTudo(){Object.keys(TABS).forEach(renderTab);}
+function novaLinha(tab){const o={};TABS[tab].cols.forEach(c=>{o[c.f]=c.type==="ps"?1:(c.type==="select"?c.opts[0]:"");});return o;}
+
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletarHeader(){["h-empresa","h-local","h-coord","h-data","h-rev"].forEach(id=>DADOS.header[id]=val(id));}
+function carregar(st){
+  if(!st)return;DADOS=st;DADOS.header=DADOS.header||{};
+  Object.keys(TABS).forEach(t=>{if(!Array.isArray(DADOS[t]))DADOS[t]=[];});
+  const h=DADOS.header;["h-empresa","h-local","h-coord","h-data","h-rev"].forEach(id=>setVal(id,h[id]));
+  renderTudo();
+}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletarHeader();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.tab){const i=+t.dataset.i,f=t.dataset.f;const num=["p","s"].includes(f);DADOS[t.dataset.tab][i][f]=num?+t.value:t.value;if(num&&t.dataset.tab==="cenarios")renderTab("cenarios");}
+  autosave();
+});
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.add){DADOS[t.dataset.add].push(novaLinha(t.dataset.add));renderTab(t.dataset.add);autosave();}
+  if(t.dataset.del){const tab=t.dataset.del;DADOS[tab].splice(+t.dataset.i,1);renderTab(tab);autosave();}
+});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletarHeader();const nome=(DADOS.header["h-empresa"]||"plano_emergencia").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="emergencia_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODO este plano. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+
+/* início */
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){}}
+if(!DADOS.cenarios||!DADOS.cenarios.length){
+  DADOS.contatos=[{orgao:"Bombeiros",tel:"193"},{orgao:"SAMU",tel:"192"},{orgao:"Polícia Militar",tel:"190"},{orgao:"Defesa Civil",tel:"199"},{orgao:"CCO / Portaria (interno)",tel:""}];
+  DADOS.brigada=[novaLinha("brigada")];
+  DADOS.cenarios=["Incêndio","Explosão","Vazamento de produto químico","Vazamento de gás / CO","Colapso estrutural","Emergência médica"].map(c=>({cenario:c,p:1,s:1,resposta:"",resp:""}));
+  DADOS.recursos=["Extintores","Hidrantes","Kit de primeiros socorros","Chuveiro / lava-olhos","Sirene / alarme","Equipamento de resgate"].map(r=>({recurso:r,local:"",qtd:"",inspecao:""}));
+  DADOS.simulados=[novaLinha("simulados")];
+  renderTudo();
+}
+</script>
+</body>
+</html>

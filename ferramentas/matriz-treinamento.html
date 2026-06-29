@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matriz de Treinamento | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .resumo{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .resumo .box{flex:1;min-width:120px;border:1px solid var(--linha);border-radius:12px;padding:12px 14px;text-align:center;background:#fff}
+  .resumo .box b{display:block;font-size:24px;font-weight:800}
+  .resumo .box span{font-size:11.5px;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px}
+  .box.ok b{color:#16a34a}.box.warn b{color:#a16207}.box.venc b{color:#dc2626}.box.tot b{color:var(--azul-500)}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.t{border-collapse:collapse;width:100%;min-width:920px;font-size:13px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:30px}
+  table.t textarea,table.t input{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 7px;font-family:inherit;font-size:13px;resize:vertical;background:transparent}
+  table.t textarea:focus,table.t input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  td.st{text-align:center;width:130px}
+  .stt{display:inline-block;min-width:104px;padding:5px 8px;border-radius:7px;font-weight:800;font-size:11px}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  footer{max-width:1180px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Matriz de Treinamento<span>Controle de treinamentos e validade (NRs)</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+  </div>
+
+  <div class="resumo">
+    <div class="box ok"><b id="r-ok">0</b><span>Em dia</span></div>
+    <div class="box warn"><b id="r-warn">0</b><span>Vence em breve</span></div>
+    <div class="box venc"><b id="r-venc">0</b><span>Vencidos</span></div>
+    <div class="box tot"><b id="r-tot">0</b><span>Registros</span></div>
+  </div>
+
+  <div class="secao">🎓 Registros de treinamento</div>
+  <div class="card">
+    <div class="hint">Preencha a <b>data de validade</b> e o status (Em dia / Vence em breve / Vencido) é calculado sozinho. "Vence em breve" = faltam 30 dias ou menos. No campo treinamento há sugestões de NRs comuns.</div>
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Colaborador</th><th>Função</th><th>Treinamento / NR</th><th>Realização</th><th>Validade</th><th>Status</th><th>Observação</th><th></th></tr></thead>
+      <tbody id="body"></tbody>
+    </table></div>
+    <datalist id="dl-nr">
+      <option value="NR-05 (CIPA)"><option value="NR-06 (EPI)"><option value="NR-10 (Elétrica)"><option value="NR-11 (Movimentação de cargas)"><option value="NR-12 (Máquinas)"><option value="NR-18 (Construção)"><option value="NR-20 (Inflamáveis)"><option value="NR-33 (Espaço confinado)"><option value="NR-35 (Trabalho em altura)"><option value="Brigada de incêndio"><option value="Integração de SSMA"><option value="Primeiros socorros">
+    </datalist>
+    <button class="btn add-row" id="add-row">+ Adicionar registro</button>
+  </div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Matriz de Treinamento<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+function statusValidade(v){
+  if(!v) return {t:"—",c:"#5b6b7a",bg:"#eef2f6",k:"none"};
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const d=new Date(v+"T00:00:00");
+  const dias=Math.round((d-hoje)/86400000);
+  if(dias<0) return {t:"Vencido",c:"#fff",bg:"#dc2626",k:"venc"};
+  if(dias<=30) return {t:"Vence em breve",c:"#5c4a06",bg:"#fde68a",k:"warn"};
+  return {t:"Em dia",c:"#fff",bg:"#16a34a",k:"ok"};
+}
+const STORE="sgi_treinamento";
+let DADOS={header:{},linhas:[]};
+function nova(){return{colab:"",funcao:"",treino:"",realizacao:"",validade:"",obs:""};}
+function render(){
+  const tb=document.getElementById("body");
+  tb.innerHTML=DADOS.linhas.map((e,i)=>{
+    const st=statusValidade(e.validade);
+    return `<tr>
+      <td class="nro">${i+1}</td>
+      <td><input data-i="${i}" data-f="colab" value="${escAttr(e.colab)}"></td>
+      <td><input data-i="${i}" data-f="funcao" value="${escAttr(e.funcao)}"></td>
+      <td><input list="dl-nr" data-i="${i}" data-f="treino" value="${escAttr(e.treino)}"></td>
+      <td><input type="date" data-i="${i}" data-f="realizacao" value="${escAttr(e.realizacao)}"></td>
+      <td><input type="date" data-i="${i}" data-f="validade" value="${escAttr(e.validade)}"></td>
+      <td class="st"><span class="stt" style="background:${st.bg};color:${st.c}">${st.t}</span></td>
+      <td><textarea data-i="${i}" data-f="obs">${esc(e.obs)}</textarea></td>
+      <td class="col-del"><button data-del="${i}">✕</button></td>
+    </tr>`;
+  }).join("");
+  atualizarResumo();
+}
+function atualizarResumo(){
+  let ok=0,warn=0,venc=0;
+  DADOS.linhas.forEach(e=>{const k=statusValidade(e.validade).k;if(k==="ok")ok++;else if(k==="warn")warn++;else if(k==="venc")venc++;});
+  document.getElementById("r-ok").textContent=ok;
+  document.getElementById("r-warn").textContent=warn;
+  document.getElementById("r-venc").textContent=venc;
+  document.getElementById("r-tot").textContent=DADOS.linhas.length;
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){DADOS.header={empresa:val("h-empresa"),responsavel:val("h-responsavel"),data:val("h-data")};}
+function carregar(st){if(!st)return;DADOS=st;if(!DADOS.linhas)DADOS.linhas=[];const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-responsavel",h.responsavel);setVal("h-data",h.data);if(!DADOS.linhas.length)DADOS.linhas=[nova()];render();}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+document.addEventListener("input",e=>{const i=e.target.dataset.i,f=e.target.dataset.f;if(i!=null&&f){DADOS.linhas[+i][f]=e.target.value;if(f==="validade")render();}autosave();});
+document.getElementById("add-row").addEventListener("click",()=>{DADOS.linhas.push(nova());render();autosave();});
+document.addEventListener("click",e=>{if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){DADOS.linhas.splice(+e.target.dataset.del,1);if(!DADOS.linhas.length)DADOS.linhas=[nova()];render();autosave();}});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.empresa||"treinamento").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="treinamento_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA a matriz. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){DADOS.linhas=[nova()];render();}}else{DADOS.linhas=[nova()];render();}
+</script>
+</body>
+</html>
