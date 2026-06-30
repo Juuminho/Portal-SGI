@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avaliação de Maturidade PSM | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  /* score geral */
+  .score{background:linear-gradient(125deg,var(--azul-900),var(--azul-700) 55%,#0c5e46);color:#fff;border-radius:var(--raio);padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:var(--sombra);margin-bottom:8px}
+  .score .num{font-size:52px;font-weight:800;line-height:1}
+  .score .num small{font-size:20px;opacity:.7}
+  .score .cls b{font-size:20px;font-weight:800;display:block}
+  .score .cls span{font-size:13px;color:#cdddea}
+  .escala{font-size:12px;color:var(--cinza);margin:14px 0 4px}
+  .escala b{color:var(--tinta)}
+  .pilar-bloco{margin-top:18px}
+  .pilar-h{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--azul-900);font-size:15px;margin-bottom:8px}
+  .pilar-h .media{margin-left:auto;font-size:13px;font-weight:700;color:var(--azul-700)}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:8px 16px}
+  .elem{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--linha)}
+  .elem:last-child{border-bottom:0}
+  .elem .nm{flex:1;font-size:13.5px;font-weight:600;min-width:160px}
+  .elem .bar{flex:1;height:10px;border-radius:6px;background:#eef2f6;overflow:hidden;min-width:90px}
+  .elem .bar i{display:block;height:100%;border-radius:6px;transition:.3s}
+  .elem select{border:1px solid var(--linha);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;min-width:150px}
+  footer{max-width:1080px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.voltar{display:none!important}.card,.score{box-shadow:none}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Avaliação de Maturidade PSM<span>Autoavaliação dos elementos do sistema (1 a 5)</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Planta</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Avaliador</label><input id="h-avaliador" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+  </div>
+
+  <div class="score">
+    <div><div class="num"><span id="sc-num">0,0</span><small>/5</small></div></div>
+    <div class="cls"><b id="sc-cls">—</b><span>Nível de maturidade geral do sistema</span></div>
+  </div>
+  <div class="escala">Escala: <b>1</b> Inexistente · <b>2</b> Inicial · <b>3</b> Definido · <b>4</b> Gerenciado · <b>5</b> Otimizado</div>
+
+  <div id="conteudo"></div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Avaliação de Maturidade PSM<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const NIVEIS=["1 — Inexistente","2 — Inicial","3 — Definido","4 — Gerenciado","5 — Otimizado"];
+const ELEMENTOS=[
+  {p:"Pilar 1 · Comprometer-se",itens:["Cultura de segurança de processo","Conformidade com normas","Competência em SP","Envolvimento da força de trabalho","Responsabilidades e governança"]},
+  {p:"Pilar 2 · Entender Riscos",itens:["Conhecimento de SP (PSI)","Identificação de perigos e análise de riscos (PHA)"]},
+  {p:"Pilar 3 · Gerenciar Riscos",itens:["Procedimentos operacionais","Permissão de trabalho","Integridade de ativos","Gestão de contratadas","Treinamento e competência","Gestão de mudanças (MOC)","Prontidão operacional","Gestão de emergências"]},
+  {p:"Pilar 4 · Aprender",itens:["Investigação de incidentes","Medição e métricas (KPIs)","Auditorias","Revisão gerencial e melhoria contínua"]}
+];
+function corNivel(n){return ["#dc2626","#f97316","#eab308","#34d399","#16a34a"][n-1]||"#cbd5e1";}
+function classifica(m){if(m<1.5)return"Inexistente";if(m<2.5)return"Inicial";if(m<3.5)return"Definido";if(m<4.5)return"Gerenciado";return"Otimizado";}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+const STORE="sgi_maturidade";
+let DADOS={header:{},niveis:{}};
+function keyOf(pi,ii){return pi+"_"+ii;}
+
+function render(){
+  document.getElementById("conteudo").innerHTML=ELEMENTOS.map((bloco,pi)=>{
+    const linhas=bloco.itens.map((it,ii)=>{
+      const k=keyOf(pi,ii); const nv=DADOS.niveis[k]||1;
+      return `<div class="elem">
+        <span class="nm">${it}</span>
+        <span class="bar"><i data-bar="${k}" style="width:${nv/5*100}%;background:${corNivel(nv)}"></i></span>
+        <select data-k="${k}">${NIVEIS.map((n,idx)=>`<option value="${idx+1}" ${idx+1===nv?"selected":""}>${n}</option>`).join("")}</select>
+      </div>`;
+    }).join("");
+    return `<div class="pilar-bloco">
+      <div class="pilar-h">${bloco.p}<span class="media" data-media="${pi}"></span></div>
+      <div class="card">${linhas}</div>
+    </div>`;
+  }).join("");
+  recalcular();
+}
+function recalcular(){
+  let soma=0,n=0;
+  ELEMENTOS.forEach((bloco,pi)=>{
+    let s=0;
+    bloco.itens.forEach((it,ii)=>{const nv=DADOS.niveis[keyOf(pi,ii)]||1;s+=nv;soma+=nv;n++;});
+    const med=bloco.itens.length?s/bloco.itens.length:0;
+    const el=document.querySelector(`[data-media="${pi}"]`); if(el)el.textContent="média "+med.toFixed(1).replace(".",",");
+  });
+  const geral=n?soma/n:0;
+  document.getElementById("sc-num").textContent=geral.toFixed(1).replace(".",",");
+  document.getElementById("sc-cls").textContent=classifica(geral);
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){DADOS.header={empresa:val("h-empresa"),avaliador:val("h-avaliador"),data:val("h-data")};}
+function carregar(st){if(!st)return;DADOS=st;DADOS.niveis=DADOS.niveis||{};const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-avaliador",h.avaliador);setVal("h-data",h.data);render();}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+document.addEventListener("change",e=>{
+  if(e.target.dataset.k){
+    const k=e.target.dataset.k,nv=+e.target.value;DADOS.niveis[k]=nv;
+    const bar=document.querySelector(`[data-bar="${k}"]`);if(bar){bar.style.width=nv/5*100+"%";bar.style.background=corNivel(nv);}
+    recalcular();autosave();
+  }
+});
+document.addEventListener("input",e=>{if(e.target.dataset.save!=null)autosave();});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.empresa||"maturidade").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maturidade_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai zerar a avaliação. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){render();}}else{render();}
+</script>
+</body>
+</html>

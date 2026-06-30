@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de KPIs | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .secao .leg{margin-left:auto;font-size:11px;font-weight:600;color:var(--cinza);text-transform:none;letter-spacing:0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .kpi{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:16px;position:relative}
+  .kpi .del{position:absolute;top:10px;right:10px;border:0;background:none;color:#b42318;cursor:pointer;font-size:15px}
+  .kpi .nome{width:100%;border:1px solid transparent;border-radius:8px;padding:4px 6px;font-size:13.5px;font-weight:700;color:var(--azul-900);font-family:inherit;margin-bottom:10px;padding-right:22px}
+  .kpi .nome:focus{outline:0;border-color:var(--azul-300);background:#fafcfe}
+  .kpi .linha-val{display:flex;align-items:baseline;gap:6px}
+  .kpi .valor{width:84px;border:1px solid var(--linha);border-radius:8px;padding:6px 8px;font-size:26px;font-weight:800;font-family:inherit;color:var(--tinta)}
+  .kpi .valor:focus{outline:0;border-color:var(--azul-300)}
+  .kpi .unid{font-size:15px;font-weight:700;color:var(--cinza)}
+  .kpi .meta-row{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--cinza)}
+  .kpi .meta-row input{width:64px;border:1px solid var(--linha);border-radius:7px;padding:4px 6px;font-family:inherit;font-size:12px}
+  .kpi .meta-row select{border:1px solid var(--linha);border-radius:7px;padding:4px 6px;font-family:inherit;font-size:12px;cursor:pointer}
+  .kpi .bar{height:8px;border-radius:6px;background:#eef2f6;overflow:hidden;margin-top:10px}
+  .kpi .bar i{display:block;height:100%;border-radius:6px;transition:width .4s}
+  .kpi .badge{display:inline-block;margin-top:10px;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
+  .add-card{border:2px dashed var(--azul-300);border-radius:var(--raio);background:none;color:var(--azul-500);font-weight:700;cursor:pointer;font-size:14px;min-height:120px}
+  .add-card:hover{background:#eef5fb}
+  footer{max-width:1180px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.voltar,.kpi .del,.add-card{display:none!important}.kpi{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Painel de KPIs<span>Indicadores de Segurança de Processo — proativos e reativos</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Setor</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Período (mês/ano)</label><input id="h-periodo" data-save placeholder="ex.: Junho/2026"></div>
+    <div class="campo"><label>Responsável</label><input id="h-responsavel" data-save></div>
+  </div>
+
+  <div class="secao">📈 Indicadores proativos (leading) <span class="leg">quanto maior, melhor</span></div>
+  <div class="grid" id="grid-proativo"></div>
+
+  <div class="secao">📉 Indicadores reativos (lagging) <span class="leg">quanto menor, melhor</span></div>
+  <div class="grid" id="grid-reativo"></div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Painel de KPIs<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+function num(v){const n=parseFloat(String(v).replace(",","."));return isNaN(n)?0:n;}
+/* na meta? proativo: valor>=meta ; reativo: valor<=meta */
+function naMeta(k){return k.tipo==="proativo" ? num(k.valor)>=num(k.meta) : num(k.valor)<=num(k.meta);}
+const STORE="sgi_kpis";
+let DADOS={header:{},kpis:[]};
+function novo(tipo){return{nome:"Novo indicador",tipo:tipo,valor:0,meta:tipo==="proativo"?100:0,unid:tipo==="proativo"?"%":"nº"};}
+
+function cardHTML(k,idx){
+  const ok=naMeta(k);
+  const cor=ok?"#16a34a":"#dc2626";
+  const pct=k.unid==="%"?Math.max(0,Math.min(100,num(k.valor))):(num(k.meta)>0?Math.max(0,Math.min(100,num(k.valor)/num(k.meta)*100)):(num(k.valor)>0?100:0));
+  return `<div class="kpi" data-idx="${idx}">
+    <button class="del" data-del="${idx}" title="Remover">✕</button>
+    <input class="nome" data-idx="${idx}" data-f="nome" value="${escAttr(k.nome)}">
+    <div class="linha-val"><input class="valor" type="text" inputmode="decimal" data-idx="${idx}" data-f="valor" value="${escAttr(k.valor)}"><span class="unid">${k.unid}</span></div>
+    <div class="bar"><i data-bar="${idx}" style="width:${pct}%;background:${cor}"></i></div>
+    <div class="meta-row">meta <input type="text" inputmode="decimal" data-idx="${idx}" data-f="meta" value="${escAttr(k.meta)}">
+      <select data-idx="${idx}" data-f="unid"><option ${k.unid==="%"?"selected":""}>%</option><option ${k.unid==="nº"?"selected":""}>nº</option></select></div>
+    <span class="badge" data-badge="${idx}" style="background:${ok?'#dcfce7':'#fee2e2'};color:${ok?'#0f7a4d':'#b42318'}">${ok?"✓ Na meta":"✗ Fora da meta"}</span>
+  </div>`;
+}
+function render(){
+  ["proativo","reativo"].forEach(tp=>{
+    const itens=DADOS.kpis.map((k,i)=>({k,i})).filter(o=>o.k.tipo===tp);
+    document.getElementById("grid-"+tp).innerHTML=itens.map(o=>cardHTML(o.k,o.i)).join("")
+      +`<button class="add-card" data-add="${tp}">+ Adicionar indicador</button>`;
+  });
+}
+function atualizarCard(idx){
+  const k=DADOS.kpis[idx]; if(!k)return;
+  const ok=naMeta(k), cor=ok?"#16a34a":"#dc2626";
+  const pct=k.unid==="%"?Math.max(0,Math.min(100,num(k.valor))):(num(k.meta)>0?Math.max(0,Math.min(100,num(k.valor)/num(k.meta)*100)):(num(k.valor)>0?100:0));
+  const bar=document.querySelector(`[data-bar="${idx}"]`); if(bar){bar.style.width=pct+"%";bar.style.background=cor;}
+  const bd=document.querySelector(`[data-badge="${idx}"]`); if(bd){bd.textContent=ok?"✓ Na meta":"✗ Fora da meta";bd.style.background=ok?"#dcfce7":"#fee2e2";bd.style.color=ok?"#0f7a4d":"#b42318";}
+  const un=document.querySelector(`.kpi[data-idx="${idx}"] .unid`); if(un)un.textContent=k.unid;
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){DADOS.header={empresa:val("h-empresa"),periodo:val("h-periodo"),responsavel:val("h-responsavel")};}
+function carregar(st){if(!st)return;DADOS=st;if(!DADOS.kpis)DADOS.kpis=[];const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-periodo",h.periodo);setVal("h-responsavel",h.responsavel);render();}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+
+document.addEventListener("input",e=>{
+  const t=e.target,idx=t.dataset.idx,f=t.dataset.f;
+  if(idx!=null&&f){DADOS.kpis[+idx][f]=t.value; if(f==="valor"||f==="meta") atualizarCard(+idx);}
+  autosave();
+});
+document.addEventListener("change",e=>{const t=e.target;if(t.dataset.f==="unid"){DADOS.kpis[+t.dataset.idx].unid=t.value;atualizarCard(+t.dataset.idx);autosave();}});
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.add){DADOS.kpis.push(novo(t.dataset.add));render();autosave();}
+  if(t.dataset.del!=null&&t.classList.contains("del")){DADOS.kpis.splice(+t.dataset.del,1);render();autosave();}
+});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.periodo||DADOS.header.empresa||"kpis").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="kpis_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODO o painel. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+
+/* início */
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){}}
+if(!DADOS.kpis||!DADOS.kpis.length){
+  DADOS.kpis=[
+    {nome:"% de MOCs concluídos",tipo:"proativo",valor:0,meta:100,unid:"%"},
+    {nome:"% de inspeções realizadas",tipo:"proativo",valor:0,meta:95,unid:"%"},
+    {nome:"% de treinamentos realizados",tipo:"proativo",valor:0,meta:100,unid:"%"},
+    {nome:"% de recomendações de HAZOP concluídas",tipo:"proativo",valor:0,meta:90,unid:"%"},
+    {nome:"Vazamentos / perdas de contenção",tipo:"reativo",valor:0,meta:0,unid:"nº"},
+    {nome:"Incêndios / princípios de incêndio",tipo:"reativo",valor:0,meta:0,unid:"nº"},
+    {nome:"Quase acidentes de processo",tipo:"reativo",valor:0,meta:0,unid:"nº"},
+    {nome:"Acidentes de processo",tipo:"reativo",valor:0,meta:0,unid:"nº"}
+  ];
+  render();
+}
+</script>
+</body>
+</html>

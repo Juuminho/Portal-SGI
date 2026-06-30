@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist de Auditoria PSM | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  .ident{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  .resumo{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .resumo .box{border:1px solid var(--linha);border-radius:12px;padding:12px 16px;text-align:center;background:#fff}
+  .resumo .box b{display:block;font-size:24px;font-weight:800}
+  .resumo .box span{font-size:11.5px;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px}
+  .box.pc b{color:var(--azul-500)}.box.nc b{color:#dc2626}
+  .barra{flex:1;min-width:150px;height:12px;border-radius:8px;background:#eef2f6;overflow:hidden}
+  .barra i{display:block;height:100%;background:linear-gradient(90deg,var(--verde-500),var(--verde-300));width:0;transition:width .4s}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:8px 16px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+  .item:last-child{border-bottom:0}
+  .item .q{flex:1;font-size:13.5px;font-weight:600;min-width:220px}
+  .item select{border:1px solid var(--linha);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:#fff}
+  .item input.obs{flex:1;min-width:180px;border:1px solid var(--linha);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px;background:#fafcfe}
+  select.s-ok{color:#16a34a}select.s-pc{color:#a16207}select.s-nc{color:#dc2626}select.s-na{color:#5b6b7a}
+  footer{max-width:1080px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.voltar{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Checklist de Auditoria PSM<span>Verificação de conformidade do sistema de gestão</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="ident">
+    <div class="campo"><label>Empresa / Planta</label><input id="h-empresa" data-save></div>
+    <div class="campo"><label>Auditor</label><input id="h-auditor" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+  </div>
+  <div class="resumo">
+    <div class="box pc"><b id="r-pc">0%</b><span>Conformidade</span></div>
+    <div class="box nc"><b id="r-nc">0</b><span>Não conformidades</span></div>
+    <div class="barra"><i id="r-barra"></i></div>
+  </div>
+  <div class="hint">Para cada item: <b>Conforme</b> (atende), <b>Parcial</b> (atende em parte = meio ponto), <b>Não conforme</b> (não atende) ou <b>N.A.</b>. A % considera os itens que se aplicam. Use a observação para registrar evidências e não conformidades.</div>
+  <div id="conteudo"></div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Checklist de Auditoria PSM<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const ITENS=[
+  {p:"1 · Comprometer-se",qs:["Existe Política de Segurança de Processo aprovada e divulgada?","Há matriz de responsabilidades (RACI) definida?","Existe comitê / análise crítica da liderança sobre SP?"]},
+  {p:"2 · Entender Riscos",qs:["As informações de SP (PFD, P&ID, FISPQ) estão atualizadas e acessíveis?","As análises de risco (APR/HAZOP/What If) estão em dia?","As recomendações das análises de risco são tratadas e encerradas?"]},
+  {p:"3 · Gerenciar Riscos",qs:["Existe procedimento de Gestão de Mudanças (MOC) e ele é seguido?","Os procedimentos operacionais estão atualizados e disponíveis?","O sistema de Permissão de Trabalho é aplicado corretamente?","Há plano de integridade/manutenção dos ativos críticos?","As contratadas são qualificadas e auditadas?","A matriz de treinamento dos colaboradores está em dia?","Existe plano de emergência testado por simulados?"]},
+  {p:"4 · Aprender",qs:["Os incidentes são investigados até a causa raiz?","Os indicadores (KPIs) de SP são monitorados?","Auditorias de SP são realizadas periodicamente?","As ações de melhoria são acompanhadas até a conclusão?"]}
+];
+const VAL={"Conforme":1,"Parcial":0.5,"Não conforme":0};
+function classeSit(v){return v==="Conforme"?"s-ok":v==="Parcial"?"s-pc":v==="Não conforme"?"s-nc":v==="N.A."?"s-na":"";}
+function optSit(sel){return ["—","Conforme","Parcial","Não conforme","N.A."].map(s=>`<option ${s===sel?"selected":""}>${s}</option>`).join("");}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+const STORE="sgi_auditoria";
+let DADOS={header:{},resp:{}};
+function keyOf(pi,ii){return pi+"_"+ii;}
+function render(){
+  document.getElementById("conteudo").innerHTML=ITENS.map((bloco,pi)=>{
+    const linhas=bloco.qs.map((q,ii)=>{
+      const k=keyOf(pi,ii); const r=DADOS.resp[k]||{sit:"—",obs:""};
+      return `<div class="item">
+        <span class="q">${q}</span>
+        <select class="${classeSit(r.sit)}" data-k="${k}" data-f="sit">${optSit(r.sit)}</select>
+        <input class="obs" data-k="${k}" data-f="obs" placeholder="observação / evidência" value="${escAttr(r.obs)}">
+      </div>`;
+    }).join("");
+    return `<div class="secao">${bloco.p}</div><div class="card">${linhas}</div>`;
+  }).join("");
+  recalc();
+}
+function recalc(){
+  let soma=0,apl=0,nc=0;
+  ITENS.forEach((bloco,pi)=>bloco.qs.forEach((q,ii)=>{
+    const r=DADOS.resp[keyOf(pi,ii)]; if(!r)return;
+    if(r.sit in VAL){soma+=VAL[r.sit];apl++; if(r.sit==="Não conforme")nc++;}
+  }));
+  const pc=apl?Math.round(soma/apl*100):0;
+  document.getElementById("r-pc").textContent=pc+"%";
+  document.getElementById("r-nc").textContent=nc;
+  document.getElementById("r-barra").style.width=pc+"%";
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){DADOS.header={empresa:val("h-empresa"),auditor:val("h-auditor"),data:val("h-data")};}
+function carregar(st){if(!st)return;DADOS=st;DADOS.resp=DADOS.resp||{};const h=DADOS.header||{};setVal("h-empresa",h.empresa);setVal("h-auditor",h.auditor);setVal("h-data",h.data);render();}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+function setResp(k,f,v){if(!DADOS.resp[k])DADOS.resp[k]={sit:"—",obs:""};DADOS.resp[k][f]=v;}
+document.addEventListener("change",e=>{if(e.target.dataset.k&&e.target.dataset.f==="sit"){setResp(e.target.dataset.k,"sit",e.target.value);e.target.className=classeSit(e.target.value);recalc();autosave();}});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.k&&t.dataset.f==="obs"){setResp(t.dataset.k,"obs",t.value);}autosave();});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header.empresa||"auditoria").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="auditoria_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA a auditoria. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){render();}}else{render();}
+</script>
+</body>
+</html>

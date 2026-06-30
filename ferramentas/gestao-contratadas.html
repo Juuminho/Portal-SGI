@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Contratadas | SGI</title>
+<style>
+  :root{
+    --azul-900:#0a2540;--azul-700:#0f3a63;--azul-500:#1769aa;--azul-300:#4aa3df;
+    --verde-700:#0f7a4d;--verde-500:#16a34a;--verde-300:#34d399;
+    --tinta:#13212e;--cinza:#5b6b7a;--linha:#dbe3ea;--fundo:#f4f7fa;--branco:#fff;
+    --sombra:0 6px 24px rgba(10,37,64,.08);--raio:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+  header.topo{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--linha)}
+  .topo-inner{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .voltar{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--azul-700);font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;border:1px solid var(--linha);background:#fff}
+  .voltar:hover{background:#eef5fb}
+  .tit{font-size:16px;font-weight:800;color:var(--azul-900)}
+  .tit span{display:block;font-size:11.5px;font-weight:500;color:var(--cinza)}
+  .toolbar{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);background:#fff;color:var(--azul-700);font-weight:600;font-size:13px;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#eef5fb;border-color:var(--azul-300)}
+  .btn.danger{color:#b42318}.btn.danger:hover{background:#fdeceb;border-color:#f1b0aa}
+  .salvo{font-size:12px;color:var(--verde-700);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  .secao{font-size:13px;font-weight:800;color:var(--azul-900);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px;display:flex;align-items:center;gap:9px}
+  .secao::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--verde-500),var(--azul-500))}
+  .secao .pct{margin-left:auto;font-size:14px;font-weight:800}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);box-shadow:var(--sombra);padding:18px}
+  .hint{font-size:12.5px;color:var(--cinza);background:#eef5fb;border-left:3px solid var(--azul-300);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .campo label{display:block;font-size:11.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+  .campo input,.campo select{width:100%;border:1px solid var(--linha);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--tinta);background:#fafcfe}
+  .campo input:focus,.campo select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.chk{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.chk td{border-bottom:1px solid var(--linha);padding:7px 6px;vertical-align:middle}
+  table.chk .chk-sel{width:150px;text-align:right}
+  table.chk select{border:1px solid var(--linha);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:#fff;min-width:120px}
+  select.s-ok{color:#16a34a}select.s-nc{color:#dc2626}select.s-na{color:#5b6b7a}
+  .tabela-wrap{overflow-x:auto;border:1px solid var(--linha);border-radius:12px}
+  table.t{border-collapse:collapse;width:100%;font-size:13px}
+  table.t th{background:var(--azul-900);color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:9px 8px;text-align:left;border-left:1px solid rgba(255,255,255,.12)}
+  table.t td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:5px;vertical-align:top}
+  table.t tr:nth-child(even) td{background:#fafcfe}
+  table.t .nro{text-align:center;font-weight:800;color:var(--cinza);width:30px}
+  table.t textarea,table.t input,table.t select{width:100%;border:1px solid transparent;border-radius:6px;padding:6px 7px;font-family:inherit;font-size:13px;resize:vertical;background:transparent}
+  table.t textarea:focus,table.t input:focus,table.t select:focus{outline:0;border-color:var(--azul-300);background:#fff}
+  table.t select{cursor:pointer}
+  .col-del button{border:0;background:none;color:#b42318;cursor:pointer;font-size:16px;padding:4px 5px}
+  .add-row{margin-top:10px}
+  .parecer{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .parecer select{font-size:15px;font-weight:700;padding:11px 14px;border-radius:10px;border:1px solid var(--linha);font-family:inherit}
+  footer{max-width:1080px;margin:0 auto;padding:20px;text-align:center;color:var(--cinza);font-size:12.5px}
+  @media print{header.topo,.toolbar,.hint,.add-row,.voltar,.col-del{display:none!important}.card{box-shadow:none;border:1px solid #ccc}main{max-width:100%;padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-inner">
+    <a class="voltar" href="../index.html">← Portal</a>
+    <div class="tit">Gestão de Contratadas<span>Qualificação documental + auditoria de campo</span></div>
+    <div class="toolbar">
+      <span class="salvo" id="salvo"></span>
+      <button class="btn" id="btn-abrir">📂 Abrir</button>
+      <button class="btn" id="btn-salvar">💾 Salvar</button>
+      <button class="btn" id="btn-pdf">🖨️ PDF</button>
+      <button class="btn danger" id="btn-limpar">🗑️ Limpar</button>
+      <input type="file" id="file-abrir" accept="application/json" hidden>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="secao">🏢 Identificação da contratada</div>
+  <div class="card"><div class="grid">
+    <div class="campo"><label>Razão social</label><input id="h-razao" data-save></div>
+    <div class="campo"><label>CNPJ</label><input id="h-cnpj" data-save></div>
+    <div class="campo"><label>Serviço contratado</label><input id="h-servico" data-save></div>
+    <div class="campo"><label>Responsável da contratada</label><input id="h-resp" data-save></div>
+    <div class="campo"><label>Contato</label><input id="h-contato" data-save></div>
+    <div class="campo"><label>Contrato nº</label><input id="h-contrato" data-save></div>
+    <div class="campo"><label>Avaliador (contratante)</label><input id="h-avaliador" data-save></div>
+    <div class="campo"><label>Data</label><input id="h-data" type="date" data-save></div>
+  </div></div>
+
+  <div class="secao">📄 Qualificação documental <span class="pct" id="pct-qual">—</span></div>
+  <div class="card"><table class="chk"><tbody id="chk-qual"></tbody></table></div>
+
+  <div class="secao">🔎 Auditoria de campo <span class="pct" id="pct-audit">—</span></div>
+  <div class="card"><table class="chk"><tbody id="chk-audit"></tbody></table></div>
+
+  <div class="secao">📋 Pendências / Plano de ação</div>
+  <div class="card">
+    <div class="tabela-wrap"><table class="t">
+      <thead><tr><th class="nro">Nº</th><th>Pendência</th><th>Responsável</th><th>Prazo</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tb-pend"></tbody>
+    </table></div>
+    <button class="btn add-row" id="add-pend">+ Adicionar pendência</button>
+  </div>
+
+  <div class="secao">✅ Parecer final</div>
+  <div class="card"><div class="parecer">
+    <span style="font-weight:600;color:var(--cinza)">Situação da contratada:</span>
+    <select id="h-parecer" data-save>
+      <option>Em avaliação</option>
+      <option>Qualificada</option>
+      <option>Qualificada com ressalvas</option>
+      <option>Não qualificada</option>
+    </select>
+  </div></div>
+</main>
+<footer>SGI — Sistema de Gestão Integrada · Gestão de Contratadas<br>Desenvolvido por <b>Júlio César Moura de Oliveira</b></footer>
+<script>
+const ITENS={
+  qual:["Contrato social / CNPJ ativo","Certidões negativas (FGTS, INSS, trabalhista)","PGR / PCMSO atualizados","ASOs dos colaboradores válidos","Certificados de treinamento (NRs aplicáveis)","Ficha de entrega de EPI","ART / Responsável técnico (quando aplicável)","Seguro / apólice (quando aplicável)","Análise de risco da atividade (APR/PT)"],
+  audit:["EPIs adequados e em uso","Permissão de Trabalho emitida e válida","Área isolada e sinalizada","Equipe treinada e identificada","Ferramentas / equipamentos inspecionados","Procedimento seguro sendo seguido","Organização e gestão de resíduos (5S)","Equipe conhece a resposta a emergência"]
+};
+const STATUS_PEND=["Não iniciado","Em andamento","Concluído"];
+function classeSit(v){return v==="Sim"?"s-ok":v==="Não"?"s-nc":v==="N.A."?"s-na":"";}
+function optSit(sel){return ["—","Sim","Não","N.A."].map(s=>`<option ${s===sel?"selected":""}>${s}</option>`).join("");}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+const STORE="sgi_contratadas";
+let DADOS={header:{},qual:[],audit:[],pend:[]};
+
+function renderChk(grp){
+  const tb=document.getElementById("chk-"+grp);
+  tb.innerHTML=ITENS[grp].map((it,i)=>{
+    const v=DADOS[grp][i]||"—";
+    return `<tr><td>${it}</td><td class="chk-sel"><select class="${classeSit(v)}" data-grp="${grp}" data-i="${i}">${optSit(v)}</select></td></tr>`;
+  }).join("");
+  atualizarPct(grp);
+}
+function atualizarPct(grp){
+  let sim=0,nao=0;
+  DADOS[grp].forEach(v=>{if(v==="Sim")sim++;else if(v==="Não")nao++;});
+  const apl=sim+nao;
+  const pct=apl?Math.round(sim/apl*100):null;
+  const el=document.getElementById("pct-"+grp);
+  el.textContent= pct==null?"—":pct+"% conforme";
+  el.style.color= pct==null?"var(--cinza)":(pct>=90?"#16a34a":pct>=70?"#a16207":"#dc2626");
+}
+function renderPend(){
+  document.getElementById("tb-pend").innerHTML=DADOS.pend.map((e,i)=>`
+    <tr><td class="nro">${i+1}</td>
+      <td><textarea data-tab="pend" data-i="${i}" data-f="o">${esc(e.o)}</textarea></td>
+      <td><input data-tab="pend" data-i="${i}" data-f="resp" value="${escAttr(e.resp)}"></td>
+      <td><input type="date" data-tab="pend" data-i="${i}" data-f="prazo" value="${escAttr(e.prazo)}"></td>
+      <td><select data-tab="pend" data-i="${i}" data-f="status">${STATUS_PEND.map(s=>`<option ${s===e.status?"selected":""}>${s}</option>`).join("")}</select></td>
+      <td class="col-del"><button data-del="${i}">✕</button></td></tr>`).join("");
+}
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||"";}
+function coletar(){
+  ["h-razao","h-cnpj","h-servico","h-resp","h-contato","h-contrato","h-avaliador","h-data","h-parecer"].forEach(id=>DADOS.header[id]=val(id));
+  DADOS.qual=[...document.querySelectorAll('select[data-grp="qual"]')].map(s=>s.value);
+  DADOS.audit=[...document.querySelectorAll('select[data-grp="audit"]')].map(s=>s.value);
+}
+function carregar(st){
+  if(!st)return;DADOS=st;DADOS.header=DADOS.header||{};
+  if(!Array.isArray(DADOS.qual))DADOS.qual=[];if(!Array.isArray(DADOS.audit))DADOS.audit=[];if(!Array.isArray(DADOS.pend))DADOS.pend=[];
+  const h=DADOS.header;["h-razao","h-cnpj","h-servico","h-resp","h-contato","h-contrato","h-avaliador","h-data","h-parecer"].forEach(id=>setVal(id,h[id]));
+  renderChk("qual");renderChk("audit");renderPend();
+}
+let tmr;function autosave(){clearTimeout(tmr);tmr=setTimeout(()=>{coletar();try{localStorage.setItem(STORE,JSON.stringify(DADOS));const s=document.getElementById("salvo");s.textContent="✓ salvo";setTimeout(()=>s.textContent="",1500);}catch(e){}},400);}
+
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.grp){DADOS[t.dataset.grp][+t.dataset.i]=t.value;t.className=classeSit(t.value);atualizarPct(t.dataset.grp);}
+  autosave();
+});
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.tab==="pend"){DADOS.pend[+t.dataset.i][t.dataset.f]=t.value;}
+  autosave();
+});
+document.getElementById("add-pend").addEventListener("click",()=>{DADOS.pend.push({o:"",resp:"",prazo:"",status:"Não iniciado"});renderPend();autosave();});
+document.addEventListener("click",e=>{if(e.target.dataset.del!=null&&e.target.tagName==="BUTTON"){DADOS.pend.splice(+e.target.dataset.del,1);renderPend();autosave();}});
+document.getElementById("btn-salvar").addEventListener("click",()=>{coletar();const nome=(DADOS.header["h-razao"]||"contratada").replace(/[^\w\-]+/g,"_");const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="contratada_"+nome+".json";a.click();});
+document.getElementById("btn-abrir").addEventListener("click",()=>document.getElementById("file-abrir").click());
+document.getElementById("file-abrir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{carregar(JSON.parse(r.result));autosave();}catch(err){alert("Não consegui ler esse arquivo.");}};r.readAsText(f);e.target.value="";});
+document.getElementById("btn-pdf").addEventListener("click",()=>window.print());
+document.getElementById("btn-limpar").addEventListener("click",()=>{if(!confirm("Isso vai apagar TODA esta avaliação. Continuar?"))return;localStorage.removeItem(STORE);location.reload();});
+
+/* início */
+const salvo=localStorage.getItem(STORE);
+if(salvo){try{carregar(JSON.parse(salvo));}catch(e){}}
+if(!DADOS.qual||!DADOS.qual.length){
+  DADOS.qual=ITENS.qual.map(()=>"—");
+  DADOS.audit=ITENS.audit.map(()=>"—");
+  DADOS.pend=[{o:"",resp:"",prazo:"",status:"Não iniciado"}];
+  renderChk("qual");renderChk("audit");renderPend();
+}
+</script>
+</body>
+</html>
